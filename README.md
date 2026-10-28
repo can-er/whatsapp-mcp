@@ -106,6 +106,17 @@ Without this setup, you'll likely run into errors like:
 
 > `Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work.`
 
+## Security
+
+### Bridge REST API
+
+The bridge exposes a small REST API (`/api/send`, `/api/download`) used by the MCP server. It is locked down by default:
+
+- It listens on `127.0.0.1:8080` only. Set `WHATSAPP_BRIDGE_ADDR` to change the address; avoid exposing it beyond loopback.
+- Every request needs an `Authorization: Bearer <token>` header. On first start the bridge generates a random token in `whatsapp-bridge/store/bridge_token` (owner-only permissions), and the MCP server reads it from there. To use your own token (for example when the MCP server runs from another directory), set `WHATSAPP_BRIDGE_TOKEN` to the same value for both processes.
+- Requests must use `Content-Type: application/json`, bodies are limited to 1 MiB, and any request carrying an `Origin` header (i.e. sent by a web page) is rejected.
+- If the bridge listens on another address, point the MCP server at it with `WHATSAPP_API_BASE_URL` (default `http://127.0.0.1:8080/api`).
+
 ## Architecture Overview
 
 This application consists of two main components:
