@@ -117,6 +117,10 @@ The bridge exposes a small REST API (`/api/send`, `/api/download`) used by the M
 - Requests must use `Content-Type: application/json`, bodies are limited to 1 MiB, and any request carrying an `Origin` header (i.e. sent by a web page) is rejected.
 - If the bridge listens on another address, point the MCP server at it with `WHATSAPP_API_BASE_URL` (default `http://127.0.0.1:8080/api`).
 
+### Sending files
+
+`send_file` and `send_audio_message` can only send files located in the folder named by `WHATSAPP_MEDIA_DIR` (symlinks are resolved, so a link pointing outside the folder is refused). Set the same value for the bridge and the MCP server. When it is not set, sending files is disabled; text messages still work. Audio converted by ffmpeg is written to that folder temporarily and deleted after sending.
+
 ## Architecture Overview
 
 This application consists of two main components:

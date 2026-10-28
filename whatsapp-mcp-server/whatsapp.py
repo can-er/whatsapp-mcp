@@ -28,6 +28,32 @@ def bridge_headers() -> dict:
             token = ""
     return {"Authorization": f"Bearer {token}"} if token else {}
 
+
+def resolve_media_path(media_path: str) -> str:
+    """Return the real path of a file that may be sent, or raise ValueError.
+
+    Only regular files located (after resolving symlinks) under WHATSAPP_MEDIA_DIR are allowed;
+    sending files is disabled when it is not set. Relative paths are relative to WHATSAPP_MEDIA_DIR.
+    The bridge enforces the same rule.
+    """
+    media_dir = os.environ.get("WHATSAPP_MEDIA_DIR", "").strip()
+    if not media_dir:
+        raise ValueError("Sending files is disabled: set WHATSAPP_MEDIA_DIR to the folder files may be sent from")
+
+    root = os.path.realpath(media_dir)
+    candidate = media_path if os.path.isabs(media_path) else os.path.join(root, media_path)
+    path = os.path.realpath(candidate)
+
+    try:
+        inside = os.path.commonpath([os.path.normcase(root), os.path.normcase(path)]) == os.path.normcase(root)
+    except ValueError:  # different drives on Windows
+        inside = False
+    if not inside or os.path.normcase(path) == os.path.normcase(root):
+        raise ValueError(f"Media file must be inside WHATSAPP_MEDIA_DIR: {media_path}")
+    if not os.path.isfile(path):
+        raise ValueError(f"Media file not found: {media_path}")
+    return path
+
 @dataclass
 class Message:
     timestamp: datetime
@@ -677,8 +703,10 @@ def send_file(recipient: str, media_path: str) -> Tuple[bool, str]:
         if not media_path:
             return False, "Media path must be provided"
         
-        if not os.path.isfile(media_path):
-            return False, f"Media file not found: {media_path}"
+        try:
+            media_path = resolve_media_path(media_path)
+        except ValueError as e:
+            return False, str(e)
         
         url = f"{WHATSAPP_API_BASE_URL}/send"
         payload = {
@@ -703,6 +731,7 @@ def send_file(recipient: str, media_path: str) -> Tuple[bool, str]:
         return False, f"Unexpected error: {str(e)}"
 
 def send_audio_message(recipient: str, media_path: str) -> Tuple[bool, str]:
+    converted_path = None
     try:
         # Validate input
         if not recipient:
@@ -711,12 +740,16 @@ def send_audio_message(recipient: str, media_path: str) -> Tuple[bool, str]:
         if not media_path:
             return False, "Media path must be provided"
         
-        if not os.path.isfile(media_path):
-            return False, f"Media file not found: {media_path}"
+        try:
+            media_path = resolve_media_path(media_path)
+        except ValueError as e:
+            return False, str(e)
 
         if not media_path.endswith(".ogg"):
             try:
-                media_path = audio.convert_to_opus_ogg_temp(media_path)
+                # Write the converted file inside the media dir so the bridge is allowed to read it
+                media_path = audio.convert_to_opus_ogg_temp(media_path, output_dir=os.path.dirname(media_path))
+                converted_path = media_path
             except Exception as e:
                 return False, f"Error converting file to opus ogg. You likely need to install ffmpeg: {str(e)}"
         
@@ -741,6 +774,9 @@ def send_audio_message(recipient: str, media_path: str) -> Tuple[bool, str]:
         return False, f"Error parsing response: {response.text}"
     except Exception as e:
         return False, f"Unexpected error: {str(e)}"
+    finally:
+        if converted_path and os.path.exists(converted_path):
+            os.unlink(converted_path)
 
 def download_media(message_id: str, chat_jid: str) -> Optional[str]:
     """Download media from a message and return the local file path.
