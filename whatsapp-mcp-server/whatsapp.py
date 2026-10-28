@@ -8,7 +8,25 @@ import json
 import audio
 
 MESSAGES_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whatsapp-bridge', 'store', 'messages.db')
-WHATSAPP_API_BASE_URL = "http://localhost:8080/api"
+BRIDGE_TOKEN_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whatsapp-bridge', 'store', 'bridge_token')
+WHATSAPP_API_BASE_URL = os.environ.get("WHATSAPP_API_BASE_URL", "http://127.0.0.1:8080/api")
+BRIDGE_REQUEST_TIMEOUT = 120
+
+
+def bridge_headers() -> dict:
+    """Authorization header for the bridge REST API.
+
+    The token comes from WHATSAPP_BRIDGE_TOKEN, or from the file the bridge generates on first start.
+    It is read on every call so the MCP server can be started before the bridge.
+    """
+    token = os.environ.get("WHATSAPP_BRIDGE_TOKEN", "").strip()
+    if not token:
+        try:
+            with open(BRIDGE_TOKEN_PATH, encoding="utf-8") as f:
+                token = f.read().strip()
+        except OSError:
+            token = ""
+    return {"Authorization": f"Bearer {token}"} if token else {}
 
 @dataclass
 class Message:
@@ -634,7 +652,7 @@ def send_message(recipient: str, message: str) -> Tuple[bool, str]:
             "message": message,
         }
         
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -668,7 +686,7 @@ def send_file(recipient: str, media_path: str) -> Tuple[bool, str]:
             "media_path": media_path
         }
         
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -708,7 +726,7 @@ def send_audio_message(recipient: str, media_path: str) -> Tuple[bool, str]:
             "media_path": media_path
         }
         
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -741,7 +759,7 @@ def download_media(message_id: str, chat_jid: str) -> Optional[str]:
             "chat_jid": chat_jid
         }
         
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         if response.status_code == 200:
             result = response.json()
