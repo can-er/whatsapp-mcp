@@ -9,7 +9,7 @@ tags: [sprint, index]
 | Sprint | Statut | Test |
 |---|---|---|
 | [[sprint-00-initialisation]] | `DONE` | [[TC-00-initialisation]] |
-| [[sprint-01-api-rest-auth]] | `TODO` | [[TC-01-api-rest-auth]] |
+| [[sprint-01-api-rest-auth]] | `DONE` | [[TC-01-api-rest-auth]] |
 | [[sprint-02-media-path-allowlist]] | `TODO` | [[TC-02-media-path-allowlist]] |
 | [[sprint-03-download-path-traversal]] | `TODO` | [[TC-03-download-path-traversal]] |
 | [[sprint-04-allowed-chats]] | `TODO` | [[TC-04-allowed-chats]] |
