@@ -27,7 +27,10 @@ Navigation par liens `[[...]]`.
 | [[sprint-05-read-only-mode]] | `TODO` | [[TC-05-read-only-mode]] |
 | [[sprint-06-store-permissions]] | `TODO` | [[TC-06-store-permissions]] |
 | [[sprint-07-bump-whatsmeow]] | `TODO` | [[TC-07-bump-whatsmeow]] |
-| [[sprint-08-integration-rapport]] | `TODO` | [[TC-08-integration-rapport]] |
+| [[sprint-08-evenements-inbox-webhook]] | `TODO` | [[TC-08-evenements-inbox-webhook]] |
+| [[sprint-09-api-envoi-health]] | `TODO` | [[TC-09-api-envoi-health]] |
+| [[sprint-10-evenements-edit-revoke-reaction]] | `TODO` | [[TC-10-evenements-edit-revoke-reaction]] |
+| [[sprint-11-integration-rapport]] | `TODO` | [[TC-11-integration-rapport]] |
 
 ## ✅ Test cases
 
@@ -40,6 +43,7 @@ Navigation par liens `[[...]]`.
 - [[ADR-0003-tests-go-docker]] — Tests Go dans un conteneur Linux avec CGO
 - [[ADR-0004-auth-pont-jeton]] — Authentification du pont par jeton Bearer partagé
 - [[ADR-0005-envoi-media-desactive-par-defaut]] — Envoi de médias désactivé tant que WHATSAPP_MEDIA_DIR n'est pas défini
+- [[ADR-0006-interface-pont-pipeline]] — Interface pont WhatsApp → pipeline KS (événements v1, API d'envoi)
 
 ## 🧩 Templates
 

@@ -14,4 +14,7 @@ tags: [test-case, index]
 - [[TC-05-read-only-mode]] — Les outils d'envoi disparaissent en lecture seule
 - [[TC-06-store-permissions]] — store/ en 0700, fichiers en 0600
 - [[TC-07-bump-whatsmeow]] — Le pont compile et fonctionne avec whatsmeow à jour
-- [[TC-08-integration-rapport]] — main du fork vert, PR ouvertes
+- [[TC-08-evenements-inbox-webhook]] — Un message autorisé produit média + événement JSON + appel webhook
+- [[TC-09-api-envoi-health]] — Envoi idempotent, audité, réservé au jeton d'envoi ; health OK
+- [[TC-10-evenements-edit-revoke-reaction]] — Edit / revoke / reaction produisent le bon type d'événement
+- [[TC-11-integration-rapport]] — main du fork vert, PR ouvertes

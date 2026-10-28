@@ -29,4 +29,4 @@ Le vault est versionné sur `main` du fork (racine du dépôt). Chaque faille a 
 
 ## 🔗 Liens
 
-- Sprints concernés : [[sprint-00-initialisation]], [[sprint-08-integration-rapport]]
+- Sprints concernés : [[sprint-00-initialisation]], [[sprint-11-integration-rapport]]
