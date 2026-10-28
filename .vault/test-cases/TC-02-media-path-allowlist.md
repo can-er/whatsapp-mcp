@@ -2,15 +2,15 @@
 type: test-case
 id: TC-02-media-path-allowlist
 sprint: sprint-02
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-02 — Seuls les fichiers du dossier d'envoi peuvent être lus
 
-> **sprint:: [[sprint-02-media-path-allowlist]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-02-media-path-allowlist]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -29,7 +29,9 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/02-media-path-allowlist`, commit `f9c2225`)
+- Go `TestResolveMediaPath` : 12 sous-cas PASS — acceptés : absolu dedans, imbriqué, relatif au dossier ; refusés : absolu hors dossier, `../`, traversée depuis l'intérieur, le dossier lui-même, un sous-dossier, fichier absent, voisin à préfixe commun (`outbox-evil`), lien symbolique sortant, variable non définie. `GOCHECK_OK`.
+- Python `tests/test_media_path.py` : 12 passed sous Windows (uv) et sous Linux (`python:3.12-slim`, cas symlink réellement exécuté) ; `send_file` / `send_audio_message` n'appellent jamais le pont pour un fichier hors dossier.
 
 ## Commande(s)
 

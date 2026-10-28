@@ -2,16 +2,16 @@
 type: sprint
 id: sprint-02
 title: "Envoi de médias restreint au dossier WHATSAPP_MEDIA_DIR"
-status: TODO          # TODO | ONGOING | DONE
+status: DONE          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-10-29
-closed:
+closed: 2026-10-29
 tags: [sprint]
 ---
 
 # Sprint 02 — Envoi de médias restreint au dossier WHATSAPP_MEDIA_DIR
 
-> **status:: TODO**  ·  **test:: [[TC-02-media-path-allowlist]]**
+> **status:: DONE**  ·  **test:: [[TC-02-media-path-allowlist]]**
 
 ## 🎯 Objectif
 
@@ -19,10 +19,10 @@ tags: [sprint]
 
 ## 📋 Tâches
 
-- [ ] Go : `resolveMediaPath` (Abs + EvalSymlinks + Rel), refus sinon
-- [ ] Go : titre de document via `filepath.Base`
-- [ ] Python : même garde dans `send_file` / `send_audio_message`, conversion ffmpeg écrite dans le dossier d'envoi
-- [ ] README
+- [x] Go : `resolveMediaPath` (Abs + EvalSymlinks + Rel), refus sinon
+- [x] Go : titre de document via `filepath.Base`
+- [x] Python : même garde dans `send_file` / `send_audio_message`, conversion ffmpeg écrite dans le dossier d'envoi
+- [x] README
 
 ## 🧪 Test associé (obligatoire)
 
@@ -32,15 +32,16 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 ## ✅ Definition of Done
 
-- [ ] Tâches terminées
-- [ ] Test [[TC-02-media-path-allowlist]] **PASS**
-- [ ] Commit fait, message préfixé `[Sprint 02]`
-- [ ] Statut de ce sprint passé à `DONE` + Home.md mis à jour
-- [ ] Bip Windows émis
+- [x] Tâches terminées
+- [x] Test [[TC-02-media-path-allowlist]] **PASS**
+- [x] Commit fait, message préfixé `[Sprint 02]`
+- [x] Statut de ce sprint passé à `DONE` + Home.md mis à jour
+- [x] Bip Windows émis
 
 ## 🧾 Journal
 
 - `2026-10-29` — Sprint créé.
+- `2026-10-29` — Garde media_path Go + Python, conversion audio dans le dossier d'envoi ; TC-02 PASS ; mergé dans main.
 
 ## 🔗 Liens
 
