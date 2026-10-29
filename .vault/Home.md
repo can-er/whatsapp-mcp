@@ -24,7 +24,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-02-media-path-allowlist]] | `DONE` | [[TC-02-media-path-allowlist]] |
 | [[sprint-03-download-path-traversal]] | `DONE` | [[TC-03-download-path-traversal]] |
 | [[sprint-04-allowed-chats]] | `DONE` | [[TC-04-allowed-chats]] |
-| [[sprint-05-read-only-mode]] | `TODO` | [[TC-05-read-only-mode]] |
+| [[sprint-05-read-only-mode]] | `DONE` | [[TC-05-read-only-mode]] |
 | [[sprint-06-store-permissions]] | `TODO` | [[TC-06-store-permissions]] |
 | [[sprint-07-bump-whatsmeow]] | `TODO` | [[TC-07-bump-whatsmeow]] |
 | [[sprint-08-evenements-inbox-webhook]] | `TODO` | [[TC-08-evenements-inbox-webhook]] |
