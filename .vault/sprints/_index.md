@@ -21,4 +21,4 @@ tags: [sprint, index]
 | [[sprint-10-evenements-edit-revoke-reaction]] | `DONE` | [[TC-10-evenements-edit-revoke-reaction]] |
 | [[sprint-11-integration-rapport]] | `DONE` | [[TC-11-integration-rapport]] |
 | [[sprint-12-code-appairage]] | `DONE` | [[TC-12-code-appairage]] |
-| [[sprint-13-api-history]] | `TODO` | [[TC-13-api-history]] |
+| [[sprint-13-api-history]] | `DONE` | [[TC-13-api-history]] |
