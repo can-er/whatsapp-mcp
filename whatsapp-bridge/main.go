@@ -50,15 +50,15 @@ type MessageStore struct {
 // Initialize message store
 func NewMessageStore() (*MessageStore, error) {
 	// Create directory for database if it doesn't exist, readable by the owner only
-	if err := ensurePrivateDir("store"); err != nil {
+	if err := ensurePrivateDir(storePath()); err != nil {
 		return nil, fmt.Errorf("failed to create store directory: %v", err)
 	}
-	if err := ensurePrivateFile("store/messages.db"); err != nil {
+	if err := ensurePrivateFile(storePath("messages.db")); err != nil {
 		return nil, fmt.Errorf("failed to create message database: %v", err)
 	}
 
 	// Open SQLite database for messages
-	db, err := sql.Open("sqlite3", "file:store/messages.db?_foreign_keys=on")
+	db, err := sql.Open("sqlite3", sqliteDSN(storePath("messages.db")))
 	if err != nil {
 		return nil, fmt.Errorf("failed to open message database: %v", err)
 	}
@@ -929,16 +929,16 @@ func main() {
 	dbLog := waLog.Stdout("Database", "INFO", true)
 
 	// Create directory for database if it doesn't exist, readable by the owner only
-	if err := ensurePrivateDir("store"); err != nil {
+	if err := ensurePrivateDir(storePath()); err != nil {
 		logger.Errorf("Failed to create store directory: %v", err)
 		return
 	}
-	if err := ensurePrivateFile("store/whatsapp.db"); err != nil {
+	if err := ensurePrivateFile(storePath("whatsapp.db")); err != nil {
 		logger.Errorf("Failed to create session database: %v", err)
 		return
 	}
 
-	container, err := sqlstore.New(context.Background(), "sqlite3", "file:store/whatsapp.db?_foreign_keys=on", dbLog)
+	container, err := sqlstore.New(context.Background(), "sqlite3", sqliteDSN(storePath("whatsapp.db")), dbLog)
 	if err != nil {
 		logger.Errorf("Failed to connect to database: %v", err)
 		return
@@ -1048,7 +1048,7 @@ func main() {
 	fmt.Println("\n✓ Connected to WhatsApp! Type 'help' for commands.")
 
 	// Load the shared secret required by the REST API (generated on first start)
-	apiToken, err := loadOrCreateBridgeToken(filepath.Join("store", "bridge_token"))
+	apiToken, err := loadOrCreateBridgeToken(storePath("bridge_token"))
 	if err != nil {
 		logger.Errorf("Failed to load API token: %v", err)
 		return
@@ -1062,7 +1062,7 @@ func main() {
 	}
 
 	// Audit log of sent messages, also used to make client_msg_id idempotent across restarts
-	sentLog, err := openSendLog(filepath.Join("store", "send_audit.jsonl"))
+	sentLog, err := openSendLog(storePath("send_audit.jsonl"))
 	if err != nil {
 		logger.Errorf("Failed to open send audit log: %v", err)
 		return

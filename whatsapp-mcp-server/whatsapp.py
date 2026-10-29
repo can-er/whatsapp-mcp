@@ -7,8 +7,10 @@ import requests
 import json
 import audio
 
-MESSAGES_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whatsapp-bridge', 'store', 'messages.db')
-BRIDGE_TOKEN_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whatsapp-bridge', 'store', 'bridge_token')
+# Bridge data directory: WHATSAPP_STORE_DIR (same value as for the bridge), or whatsapp-bridge/store next to this repo
+STORE_DIR = os.environ.get("WHATSAPP_STORE_DIR", "").strip() or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'whatsapp-bridge', 'store')
+MESSAGES_DB_PATH = os.path.join(STORE_DIR, 'messages.db')
+BRIDGE_TOKEN_PATH = os.path.join(STORE_DIR, 'bridge_token')
 WHATSAPP_API_BASE_URL = os.environ.get("WHATSAPP_API_BASE_URL", "http://127.0.0.1:8080/api")
 BRIDGE_REQUEST_TIMEOUT = 120
 
