@@ -2,15 +2,15 @@
 type: test-case
 id: TC-14-store-dir
 sprint: sprint-14
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-14 — Toutes les données vont dans WHATSAPP_STORE_DIR
 
-> **sprint:: [[sprint-14-store-dir]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-14-store-dir]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -28,7 +28,10 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/14-store-dir`, commit `ef71428`)
+- `TestStoreDirFromEnv` : avec `WHATSAPP_STORE_DIR` (chemin contenant un espace), messages.db, whatsapp.db (sqlstore réel), bridge_token et send_audit.jsonl créés dedans en 0600, dossier en 0700, médias dessous, rien dans `./store`. `TestStoreDirDefault` : défaut `store/` inchangé.
+- Python `tests/test_store_dir.py` : chemins et lecture du jeton dérivés de la variable ; défaut inchangé. 32 passed.
+- Suite Go complète `GOCHECK_OK` (38 tests).
 
 ## Commande(s)
 
