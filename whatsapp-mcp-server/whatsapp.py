@@ -13,13 +13,16 @@ WHATSAPP_API_BASE_URL = os.environ.get("WHATSAPP_API_BASE_URL", "http://127.0.0.
 BRIDGE_REQUEST_TIMEOUT = 120
 
 
-def bridge_headers() -> dict:
+def bridge_headers(send: bool = False) -> dict:
     """Authorization header for the bridge REST API.
 
     The token comes from WHATSAPP_BRIDGE_TOKEN, or from the file the bridge generates on first start.
     It is read on every call so the MCP server can be started before the bridge.
+    Sending uses WHATSAPP_SEND_TOKEN instead when it is set (the bridge then requires it for /api/send).
     """
-    token = os.environ.get("WHATSAPP_BRIDGE_TOKEN", "").strip()
+    token = os.environ.get("WHATSAPP_SEND_TOKEN", "").strip() if send else ""
+    if not token:
+        token = os.environ.get("WHATSAPP_BRIDGE_TOKEN", "").strip()
     if not token:
         try:
             with open(BRIDGE_TOKEN_PATH, encoding="utf-8") as f:
@@ -710,7 +713,7 @@ def send_message(recipient: str, message: str) -> Tuple[bool, str]:
             "message": message,
         }
         
-        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
+        response = requests.post(url, json=payload, headers=bridge_headers(send=True), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -746,7 +749,7 @@ def send_file(recipient: str, media_path: str) -> Tuple[bool, str]:
             "media_path": media_path
         }
         
-        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
+        response = requests.post(url, json=payload, headers=bridge_headers(send=True), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -791,7 +794,7 @@ def send_audio_message(recipient: str, media_path: str) -> Tuple[bool, str]:
             "media_path": media_path
         }
         
-        response = requests.post(url, json=payload, headers=bridge_headers(), timeout=BRIDGE_REQUEST_TIMEOUT)
+        response = requests.post(url, json=payload, headers=bridge_headers(send=True), timeout=BRIDGE_REQUEST_TIMEOUT)
         
         # Check if the request was successful
         if response.status_code == 200:

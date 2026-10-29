@@ -63,7 +63,7 @@ func TestChatAllowlistParsing(t *testing.T) {
 // Chats outside the allowlist cannot be reached through the API; the request is rejected
 // before the (nil) WhatsApp client is used.
 func TestChatAllowlistAPI(t *testing.T) {
-	handler := requireAPIAuth(testToken, newAPIMux(nil, nil, parseChatAllowlist("15550000001")))
+	handler := requireAPIAuth(apiTokens{bridge: testToken}, newAPIMux(nil, nil, parseChatAllowlist("15550000001"), apiOptions{}))
 
 	requests := map[string]string{
 		"/api/send":     `{"recipient":"32400000000","message":"hi"}`,

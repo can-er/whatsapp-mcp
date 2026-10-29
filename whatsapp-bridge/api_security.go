@@ -10,6 +10,7 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -64,9 +65,7 @@ func loadOrCreateBridgeToken(tokenPath string) (string, error) {
 
 // requireAPIAuth rejects browser requests, unauthenticated requests and non-JSON bodies
 // before they reach the API handlers, and caps the request body size.
-func requireAPIAuth(token string, next http.Handler) http.Handler {
-	expected := []byte("Bearer " + token)
-
+func requireAPIAuth(tokens apiTokens, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Browsers always send Origin on cross-site POSTs; the API is never meant to be called from a web page
 		if r.Header.Get("Origin") != "" {
@@ -74,7 +73,12 @@ func requireAPIAuth(token string, next http.Handler) http.Handler {
 			return
 		}
 
-		if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), expected) != 1 {
+		// /api/send requires the dedicated send token when one is configured
+		token := tokens.bridge
+		if tokens.send != "" && path.Clean(r.URL.Path) == "/api/send" {
+			token = tokens.send
+		}
+		if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+token)) != 1 {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

@@ -199,6 +199,13 @@ Event format (version 1):
 
 `chat_jid` uses the phone-number form when a LID chat can be resolved (`chat_lid` then holds the LID). `sender_phone` is always the real number, or `null` when only the LID is known (`sender_lid`). If the media cannot be downloaded, `media.status` is `"failed"`, `media.error` explains why and `media.path` is `null`. `media` is `null` for text messages.
 
+## Send API hardening (fork)
+
+- `WHATSAPP_SEND_TOKEN` (at least 32 characters, different from the bridge token): when set, `/api/send` only accepts this token, so a process that holds the bridge token can read (`/api/download`, `/api/health`) but cannot send. The MCP server uses it for its send tools when it is in its environment.
+- `client_msg_id` (optional field of `/api/send`): a request repeated with the same key does not send a second message; the response is the original one with `"duplicate": true`. Responses include the WhatsApp `message_id`.
+- Every send is appended to `whatsapp-bridge/store/send_audit.jsonl` (`0600`): time, recipient, `client_msg_id`, SHA-256 of the text (never the text itself), success and message ID. The file is replayed on start, so idempotency survives restarts.
+- `GET /api/health` (bridge token) returns `{"connected": true, "logged_in": true, "last_event_at": "…"}`.
+
 ## Architecture Overview
 
 This application consists of two main components:

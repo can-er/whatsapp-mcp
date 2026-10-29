@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -194,8 +195,10 @@ func extractTextContent(msg *waProto.Message) string {
 
 // SendMessageResponse represents the response for the send message API
 type SendMessageResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success   bool   `json:"success"`
+	Message   string `json:"message"`
+	MessageID string `json:"message_id,omitempty"`
+	Duplicate bool   `json:"duplicate,omitempty"`
 }
 
 // SendMessageRequest represents the request body for the send message API
@@ -203,12 +206,14 @@ type SendMessageRequest struct {
 	Recipient string `json:"recipient"`
 	Message   string `json:"message"`
 	MediaPath string `json:"media_path,omitempty"`
+	// Optional idempotency key: a request repeated with the same key does not send a second message
+	ClientMsgID string `json:"client_msg_id,omitempty"`
 }
 
 // Function to send a WhatsApp message
-func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message string, mediaPath string) (bool, string) {
+func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message string, mediaPath string) (bool, string, string) {
 	if !client.IsConnected() {
-		return false, "Not connected to WhatsApp"
+		return false, "Not connected to WhatsApp", ""
 	}
 
 	// Create JID for recipient
@@ -222,7 +227,7 @@ func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message str
 		// Parse the JID string
 		recipientJID, err = types.ParseJID(recipient)
 		if err != nil {
-			return false, fmt.Sprintf("Error parsing JID: %v", err)
+			return false, fmt.Sprintf("Error parsing JID: %v", err), ""
 		}
 	} else {
 		// Create JID from phone number
@@ -239,13 +244,13 @@ func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message str
 		// Only files under WHATSAPP_MEDIA_DIR may be sent
 		mediaPath, err = resolveMediaPath(os.Getenv("WHATSAPP_MEDIA_DIR"), mediaPath)
 		if err != nil {
-			return false, err.Error()
+			return false, err.Error(), ""
 		}
 
 		// Read media file
 		mediaData, err := os.ReadFile(mediaPath)
 		if err != nil {
-			return false, fmt.Sprintf("Error reading media file: %v", err)
+			return false, fmt.Sprintf("Error reading media file: %v", err), ""
 		}
 
 		// Determine media type and mime type based on file extension
@@ -294,7 +299,7 @@ func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message str
 		// Upload media to WhatsApp servers
 		resp, err := client.Upload(context.Background(), mediaData, mediaType)
 		if err != nil {
-			return false, fmt.Sprintf("Error uploading media: %v", err)
+			return false, fmt.Sprintf("Error uploading media: %v", err), ""
 		}
 
 		fmt.Println("Media uploaded", resp)
@@ -324,7 +329,7 @@ func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message str
 					seconds = analyzedSeconds
 					waveform = analyzedWaveform
 				} else {
-					return false, fmt.Sprintf("Failed to analyze Ogg Opus file: %v", err)
+					return false, fmt.Sprintf("Failed to analyze Ogg Opus file: %v", err), ""
 				}
 			} else {
 				fmt.Printf("Not an Ogg Opus file: %s\n", mimeType)
@@ -371,13 +376,13 @@ func sendWhatsAppMessage(client *whatsmeow.Client, recipient string, message str
 	}
 
 	// Send message
-	_, err = client.SendMessage(context.Background(), recipientJID, msg)
+	sendResp, err := client.SendMessage(context.Background(), recipientJID, msg)
 
 	if err != nil {
-		return false, fmt.Sprintf("Error sending message: %v", err)
+		return false, fmt.Sprintf("Error sending message: %v", err), ""
 	}
 
-	return true, fmt.Sprintf("Message sent to %s", recipient)
+	return true, fmt.Sprintf("Message sent to %s", recipient), sendResp.ID
 }
 
 // Extract media info from a message
@@ -699,8 +704,15 @@ func extractDirectPathFromURL(url string) string {
 }
 
 // Build the REST API routes exposing the WhatsApp client functionality
-func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *chatAllowlist) *http.ServeMux {
+func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *chatAllowlist, opts apiOptions) *http.ServeMux {
 	mux := http.NewServeMux()
+
+	send := opts.send
+	if send == nil {
+		send = func(recipient, message, mediaPath string) (bool, string, string) {
+			return sendWhatsAppMessage(client, recipient, message, mediaPath)
+		}
+	}
 
 	// Handler for sending messages
 	mux.HandleFunc("/api/send", func(w http.ResponseWriter, r *http.Request) {
@@ -732,24 +744,38 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *ch
 			return
 		}
 
-		fmt.Println("Received request to send message", req.Message, req.MediaPath)
-
-		// Send the message
-		success, message := sendWhatsAppMessage(client, req.Recipient, req.Message, req.MediaPath)
-		fmt.Println("Message sent", success, message)
+		// Send the message (once per client_msg_id), recorded in the audit log
+		rec, duplicate := opts.sendLog.Send(req.ClientMsgID, req.Recipient, req.Message, req.MediaPath, send)
+		fmt.Println("Message sent", rec.Success, rec.Status, "duplicate:", duplicate)
 		// Set response headers
 		w.Header().Set("Content-Type", "application/json")
 
 		// Set appropriate status code
-		if !success {
+		if !rec.Success {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
 		// Send response
 		json.NewEncoder(w).Encode(SendMessageResponse{
-			Success: success,
-			Message: message,
+			Success:   rec.Success,
+			Message:   rec.Status,
+			MessageID: rec.MessageID,
+			Duplicate: duplicate,
 		})
+	})
+
+	// Handler for the bridge status
+	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		status := healthStatus{}
+		if opts.health != nil {
+			status = opts.health()
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(status)
 	})
 
 	// Handler for downloading media
@@ -811,10 +837,10 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *ch
 }
 
 // Start a REST API server to expose the WhatsApp client functionality
-func startRESTServer(client *whatsmeow.Client, messageStore *MessageStore, allowed *chatAllowlist, addr string, token string) {
+func startRESTServer(client *whatsmeow.Client, messageStore *MessageStore, allowed *chatAllowlist, addr string, tokens apiTokens, opts apiOptions) {
 	server := &http.Server{
 		Addr:              addr,
-		Handler:           requireAPIAuth(token, newAPIMux(client, messageStore, allowed)),
+		Handler:           requireAPIAuth(tokens, newAPIMux(client, messageStore, allowed, opts)),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
@@ -900,10 +926,14 @@ func main() {
 		logger.Infof("Message events enabled (inbox: %q, webhook: %t)", eventSink.inboxDir, eventSink.webhookURL != "")
 	}
 
+	// Time of the last received message, reported by /api/health
+	var lastEventAt atomic.Int64
+
 	// Setup event handling for messages and history sync
 	client.AddEventHandler(func(evt interface{}) {
 		switch v := evt.(type) {
 		case *events.Message:
+			lastEventAt.Store(time.Now().UnixNano())
 			// Process regular messages
 			handleMessage(client, messageStore, v, allowedChats, eventSink, logger)
 
@@ -978,8 +1008,34 @@ func main() {
 		return
 	}
 
+	// Optional dedicated token for /api/send, so read-only processes cannot send
+	tokens := apiTokens{bridge: apiToken, send: strings.TrimSpace(os.Getenv("WHATSAPP_SEND_TOKEN"))}
+	if tokens.send != "" && (len(tokens.send) < 32 || tokens.send == tokens.bridge) {
+		logger.Errorf("WHATSAPP_SEND_TOKEN must be at least 32 characters and differ from the bridge token")
+		return
+	}
+
+	// Audit log of sent messages, also used to make client_msg_id idempotent across restarts
+	sentLog, err := openSendLog(filepath.Join("store", "send_audit.jsonl"))
+	if err != nil {
+		logger.Errorf("Failed to open send audit log: %v", err)
+		return
+	}
+
+	opts := apiOptions{
+		sendLog: sentLog,
+		health: func() healthStatus {
+			status := healthStatus{Connected: client.IsConnected(), LoggedIn: client.IsLoggedIn()}
+			if last := lastEventAt.Load(); last != 0 {
+				t := time.Unix(0, last).UTC()
+				status.LastEventAt = &t
+			}
+			return status
+		},
+	}
+
 	// Start REST API server
-	startRESTServer(client, messageStore, allowedChats, listenAddr(), apiToken)
+	startRESTServer(client, messageStore, allowedChats, listenAddr(), tokens, opts)
 
 	// Create a channel to keep the main goroutine alive
 	exitChan := make(chan os.Signal, 1)
