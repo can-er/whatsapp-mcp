@@ -233,6 +233,7 @@ This application consists of two main components:
 - The database maintains tables for chats and messages
 - Messages are indexed for efficient searching and retrieval
 - `whatsapp-bridge/store/` holds your WhatsApp session keys (`whatsapp.db`, which give full access to your account) and your message history. The bridge restricts it to your user: the directory is set to `0700` (also when it already exists) and the databases and downloaded media to `0600`.
+- Set `WHATSAPP_STORE_DIR` (for the bridge and the MCP server) to keep this data elsewhere than `whatsapp-bridge/store/` relative to the working directory, e.g. a systemd `StateDirectory=`. Use one directory per bridge instance (each WhatsApp account).
 - On Windows these permission bits do not apply; the folder inherits the access rules of its parent. Keep the repository inside your user profile, or restrict the folder explicitly, e.g. `icacls whatsapp-bridge\store /inheritance:r /grant:r "%USERNAME%:(OI)(CI)F"`.
 
 ## Usage

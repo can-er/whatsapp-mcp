@@ -71,7 +71,7 @@ func localMediaPath(chatJID, mediaType, messageID, filename string) (string, str
 	if filename == "" {
 		filename = mediaType + "_" + sanitizeFilename(messageID)
 	}
-	return mediaFilePath("store", chatJID, filename)
+	return mediaFilePath(storePath(), chatJID, filename)
 }
 
 // mediaFilePath returns the directory for a chat's media under storeDir and the path of the
