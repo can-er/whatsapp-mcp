@@ -20,5 +20,5 @@ tags: [sprint, index]
 | [[sprint-09-api-envoi-health]] | `DONE` | [[TC-09-api-envoi-health]] |
 | [[sprint-10-evenements-edit-revoke-reaction]] | `DONE` | [[TC-10-evenements-edit-revoke-reaction]] |
 | [[sprint-11-integration-rapport]] | `DONE` | [[TC-11-integration-rapport]] |
-| [[sprint-12-code-appairage]] | `ONGOING` | [[TC-12-code-appairage]] |
+| [[sprint-12-code-appairage]] | `DONE` | [[TC-12-code-appairage]] |
 | [[sprint-13-api-history]] | `TODO` | [[TC-13-api-history]] |

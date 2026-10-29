@@ -2,16 +2,16 @@
 type: sprint
 id: sprint-12
 title: "Appairage par code (WHATSAPP_PAIR_PHONE) livré par inbox + webhook (fork)"
-status: ONGOING          # TODO | ONGOING | DONE
+status: DONE          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-10-29
-closed:
+closed: 2026-10-29
 tags: [sprint]
 ---
 
 # Sprint 12 — Appairage par code (WHATSAPP_PAIR_PHONE) livré par inbox + webhook (fork)
 
-> **status:: ONGOING**  ·  **test:: [[TC-12-code-appairage]]**
+> **status:: DONE**  ·  **test:: [[TC-12-code-appairage]]**
 
 ## 🎯 Objectif
 
@@ -19,11 +19,11 @@ Avec `WHATSAPP_PAIR_PHONE`, un pont non appairé obtient un code d'appairage (`P
 
 ## 📋 Tâches
 
-- [ ] `pairingNotifier` : format des événements, `phone_hint`, intervalle minimal 60 s
-- [ ] Livraison générique `eventSink.deliver` (inbox atomique + webhook)
-- [ ] Boucle d'appairage : nouvelle session tant que non appairé, délai global `WHATSAPP_PAIR_TIMEOUT_MINUTES` (30)
-- [ ] Mode QR inchangé sans la variable
-- [ ] README
+- [x] `pairingNotifier` : format des événements, `phone_hint`, intervalle minimal 60 s
+- [x] Livraison générique `eventSink.deliver` (inbox atomique + webhook)
+- [x] Boucle d'appairage : nouvelle session tant que non appairé, délai global `WHATSAPP_PAIR_TIMEOUT_MINUTES` (30)
+- [x] Mode QR inchangé sans la variable
+- [x] README
 
 ## 🧪 Test associé (obligatoire)
 
@@ -33,15 +33,16 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 ## ✅ Definition of Done
 
-- [ ] Tâches terminées
-- [ ] Test [[TC-12-code-appairage]] **PASS**
-- [ ] Commit fait, message préfixé `[Sprint 12]`
-- [ ] Statut de ce sprint passé à `DONE` + Home.md mis à jour
-- [ ] Bip Windows émis
+- [x] Tâches terminées
+- [x] Test [[TC-12-code-appairage]] **PASS**
+- [x] Commit fait, message préfixé `[Sprint 12]`
+- [x] Statut de ce sprint passé à `DONE` + Home.md mis à jour
+- [x] Bip Windows émis
 
 ## 🧾 Journal
 
 - `2026-10-29` — Sprint créé à la demande de ks-support-agent-6b (spécification reçue, cf. ADR-0006).
+- `2026-10-29` — Appairage par code livré par inbox + webhook ; TC-12 PASS ; mergé dans main.
 
 ## 🔗 Liens
 
