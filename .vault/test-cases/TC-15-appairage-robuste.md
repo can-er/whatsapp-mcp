@@ -32,7 +32,7 @@ tags: [test-case]
 
 - `2026-10-29` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/15/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 44 tests PASS dont TestDeliverRecreatesMissingEventsDir, TestDeliverCallsWebhookWhenInboxFails, TestPairingRequestLimit, TestPairingRateLimitBackoff (5/10/20/40/60/60 min), TestPairingStoppedEvent, TestPairMaxCodes.
 - Non testé : la boucle réseau réelle (`PairPhone`, fermeture de session après 429) — à valider au redéploiement sur la VM ks-agent.
-- Diagnostic : dans le code de cda7e66, un échec d'écriture inbox faisait sortir `deliver` avant l'appel du webhook (les deux canaux muets en même temps). Le cas « dossier events/ non recréé après redémarrage » n'est pas reproductible tel quel (`prepareInbox` le crée au démarrage, ou le pont s'arrête) : nouveau journal de démarrage pour trancher.
+- Diagnostic confirmé par le journal de la VM (ks-support-agent-47) : la livraison n'était pas en cause (7 codes écrits entre 17:49 et 18:03, aucun « Failed to deliver », inbox et webhook actifs à chaque démarrage). Cause réelle : 429 rate-overlimit dès 18:06, puis 173 refus, l'ancien code redemandant un code à chaque rotation de QR (environ toutes les 20 s). La limite de demandes et le recul sur 429 de ce sprint traitent ce cas ; le correctif de `deliver` reste valable mais n'était pas la cause.
 
 ## Commande(s)
 
