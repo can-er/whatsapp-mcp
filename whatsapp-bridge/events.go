@@ -60,6 +60,28 @@ type MessageEvent struct {
 	Text            string      `json:"text"`
 	QuotedMessageID *string     `json:"quoted_message_id"`
 	Media           *EventMedia `json:"media"`
+	// Only for type edit, revoke and reaction: the message the update refers to
+	TargetMessageID *string `json:"target_message_id,omitempty"`
+	// Only for type reaction: the emoji, empty when the reaction was removed
+	Reaction *string `json:"reaction,omitempty"`
+}
+
+// messageUpdate detects edits, deletions and reactions, which refer to an earlier message.
+// kind is "" for a regular message.
+func messageUpdate(msg *waE2E.Message) (kind, target, text string, reaction *string) {
+	if pm := msg.GetProtocolMessage(); pm != nil {
+		switch pm.GetType() {
+		case waE2E.ProtocolMessage_MESSAGE_EDIT:
+			return "edit", pm.GetKey().GetID(), messageText(pm.GetEditedMessage()), nil
+		case waE2E.ProtocolMessage_REVOKE:
+			return "revoke", pm.GetKey().GetID(), "", nil
+		}
+	}
+	if r := msg.GetReactionMessage(); r != nil {
+		emoji := r.GetText()
+		return "reaction", r.GetKey().GetID(), "", &emoji
+	}
+	return "", "", "", nil
 }
 
 // lidResolver maps a LID JID to the phone-number JID it belongs to, if known
@@ -212,6 +234,12 @@ func buildMessageEvent(evt *events.Message, chatName string, resolve lidResolver
 	}
 	if !senderLID.IsEmpty() {
 		ev.SenderLID = optionalString(senderLID.String())
+	}
+
+	if kind, target, text, reaction := messageUpdate(evt.Message); kind != "" {
+		ev.Type, ev.Text, ev.Reaction = kind, text, reaction
+		ev.TargetMessageID = &target
+		return ev, nil
 	}
 
 	downloadable, media := messageMedia(evt.Message)
