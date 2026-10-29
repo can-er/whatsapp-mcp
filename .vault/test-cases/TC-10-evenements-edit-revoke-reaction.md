@@ -2,15 +2,15 @@
 type: test-case
 id: TC-10-evenements-edit-revoke-reaction
 sprint: sprint-10
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-10 — Edit / revoke / reaction produisent le bon type d'événement
 
-> **sprint:: [[sprint-10-evenements-edit-revoke-reaction]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-10-evenements-edit-revoke-reaction]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -27,7 +27,11 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/10-evenements-edit-revoke-reaction`, commit `8ca6d8f`)
+- `TestEventKinds` : edit (nouveau texte), revoke, reaction 👍, reaction retirée (`""`) → bon `type` et `target_message_id`, aucun média ; message normal → `type: message` sans champs de mise à jour.
+- `TestEventUpdateWrittenToInbox` : réaction écrite dans `events/` avec `target_message_id` et `reaction`.
+- `TestUpdateMessageContent` (SQLite réel) : le texte stocké est remplacé après un edit.
+- Suite complète `GOCHECK_OK`.
 
 ## Commande(s)
 
