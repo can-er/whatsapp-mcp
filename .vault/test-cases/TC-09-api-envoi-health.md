@@ -2,15 +2,15 @@
 type: test-case
 id: TC-09-api-envoi-health
 sprint: sprint-09
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-09 — Envoi idempotent, audité, réservé au jeton d'envoi ; health OK
 
-> **sprint:: [[sprint-09-api-envoi-health]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-09-api-envoi-health]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -31,7 +31,11 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/09-api-envoi-health`, commit `1cd4350`)
+- `TestSendTokenSeparation` : jeton du pont sur `/api/send` (et `/api//send`) → refusé ; jeton d'envoi → 200 avec `message_id` ; jeton d'envoi sur `/api/health` → 401.
+- `TestSendIdempotency` : même `client_msg_id` → 1 seul envoi, même `message_id`, `duplicate: true` ; 10 tentatives concurrentes → 1 envoi. `TestSendFailureIsNotCached` : échec puis nouvel essai → renvoi.
+- `TestSendAuditLog` : ligne JSONL avec sha256 du texte (texte absent du fichier), mode 0600, idempotence conservée après réouverture. `TestSendRespectsAllowlist` : 403, aucun envoi. `TestHealth` : `connected`, `logged_in`, `last_event_at` ; 401 sans jeton.
+- Suite complète 29 tests `GOCHECK_OK` ; pytest 30 passed ; en-têtes Python (jeton d'envoi) vérifiés.
 
 ## Commande(s)
 

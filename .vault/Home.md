@@ -28,7 +28,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-06-store-permissions]] | `DONE` | [[TC-06-store-permissions]] |
 | [[sprint-07-bump-whatsmeow]] | `DONE` | [[TC-07-bump-whatsmeow]] |
 | [[sprint-08-evenements-inbox-webhook]] | `DONE` | [[TC-08-evenements-inbox-webhook]] |
-| [[sprint-09-api-envoi-health]] | `TODO` | [[TC-09-api-envoi-health]] |
+| [[sprint-09-api-envoi-health]] | `DONE` | [[TC-09-api-envoi-health]] |
 | [[sprint-10-evenements-edit-revoke-reaction]] | `TODO` | [[TC-10-evenements-edit-revoke-reaction]] |
 | [[sprint-11-integration-rapport]] | `TODO` | [[TC-11-integration-rapport]] |
 
