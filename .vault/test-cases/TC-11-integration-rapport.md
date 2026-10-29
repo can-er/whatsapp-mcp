@@ -2,15 +2,15 @@
 type: test-case
 id: TC-11-integration-rapport
 sprint: sprint-11
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-11 — main du fork vert, PR ouvertes
 
-> **sprint:: [[sprint-11-integration-rapport]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-11-integration-rapport]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -30,7 +30,12 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (`main` = `origin/main` = `7ae8eb3` avant ce commit)
+- Go, Linux (CGO) : 32 tests PASS, `GOCHECK_OK`. Go, Windows natif : `go vet` et `go test` OK.
+- Python : 30 passed.
+- `check_no_pii.py --history` : 0 occurrence ; diffs des PR #388 et #389 : 0 occurrence.
+- PR upstream ouvertes : #388 (lecture seule) https://github.com/lharries/whatsapp-mcp/pull/388 et #389 (permissions) https://github.com/lharries/whatsapp-mcp/pull/389.
+- Fork : https://github.com/can-er/whatsapp-mcp, `main` + branches `fix/01` à `fix/10`.
 
 ## Commande(s)
 

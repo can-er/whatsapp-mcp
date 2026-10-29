@@ -30,7 +30,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-08-evenements-inbox-webhook]] | `DONE` | [[TC-08-evenements-inbox-webhook]] |
 | [[sprint-09-api-envoi-health]] | `DONE` | [[TC-09-api-envoi-health]] |
 | [[sprint-10-evenements-edit-revoke-reaction]] | `DONE` | [[TC-10-evenements-edit-revoke-reaction]] |
-| [[sprint-11-integration-rapport]] | `TODO` | [[TC-11-integration-rapport]] |
+| [[sprint-11-integration-rapport]] | `DONE` | [[TC-11-integration-rapport]] |
 
 ## ✅ Test cases
 
