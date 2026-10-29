@@ -152,6 +152,53 @@ Other chats are then not stored, are hidden from the MCP tools (even if they wer
 
 File names of received documents are chosen by the sender, so the bridge reduces them to a single safe file name (no directories, `..`, control characters or Windows reserved names) before saving media under `whatsapp-bridge/store/<chat>/`.
 
+## Message events (fork)
+
+For local automation, the bridge can emit every real-time message of the allowed chats (see `WHATSAPP_ALLOWED_CHATS`; history sync is not emitted). Both outputs are optional and independent:
+
+| Variable | Meaning |
+|---|---|
+| `WHATSAPP_INBOX_DIR` | Durable inbox. Media is downloaded first to `media/<message id>.<ext>` (full quality, generated name), then the event is written to `events/<YYYYMMDDTHHMMSSZ>_<message id>.json`. Both are written to `tmp/` and renamed, so watch `events/` for `IN_MOVED_TO`. |
+| `WHATSAPP_EVENT_WEBHOOK_URL` | Wake-up call: the same JSON is POSTed there (3 attempts, 10 s timeout). Only `localhost` / loopback URLs are accepted. |
+| `WHATSAPP_EVENT_WEBHOOK_TOKEN` | Sent as `Authorization: Bearer <token>` to the webhook. |
+| `WHATSAPP_INBOX_RETENTION_DAYS` | Files older than this are deleted by the bridge (default 30, `0` disables the purge). |
+
+Sub-directories are created with mode `0750` and files with `0640`. The inbox root is never chmod-ed, so to share it with another Unix user, create it as `chown <bridge-user>:<group> inbox && chmod 2750 inbox`: the setgid bit makes every file inherit the group. Keep the inbox outside `whatsapp-bridge/store/`.
+
+Event format (version 1):
+
+```json
+{
+  "version": 1,
+  "type": "message",
+  "id": "3EB0C0FFEE",
+  "chat_jid": "15550000001@s.whatsapp.net",
+  "chat_lid": null,
+  "chat_name": "Display name (informative only)",
+  "sender_jid": "15550000001@s.whatsapp.net",
+  "sender_phone": "15550000001",
+  "sender_lid": null,
+  "sender_name": "Push name (informative only)",
+  "is_from_me": false,
+  "timestamp": "2026-10-29T09:30:00Z",
+  "received_at": "2026-10-29T09:30:02Z",
+  "text": "Message text or media caption",
+  "quoted_message_id": null,
+  "media": {
+    "status": "ok",
+    "type": "audio",
+    "mime": "audio/ogg; codecs=opus",
+    "path": "/srv/inbox/media/3EB0C0FFEE.ogg",
+    "size": 12345,
+    "sha256": "…",
+    "voice": true,
+    "duration_s": 7
+  }
+}
+```
+
+`chat_jid` uses the phone-number form when a LID chat can be resolved (`chat_lid` then holds the LID). `sender_phone` is always the real number, or `null` when only the LID is known (`sender_lid`). If the media cannot be downloaded, `media.status` is `"failed"`, `media.error` explains why and `media.path` is `null`. `media` is `null` for text messages.
+
 ## Architecture Overview
 
 This application consists of two main components:
