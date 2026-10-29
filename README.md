@@ -199,6 +199,8 @@ Event format (version 1):
 
 `chat_jid` uses the phone-number form when a LID chat can be resolved (`chat_lid` then holds the LID). `sender_phone` is always the real number, or `null` when only the LID is known (`sender_lid`). If the media cannot be downloaded, `media.status` is `"failed"`, `media.error` explains why and `media.path` is `null`. `media` is `null` for text messages.
 
+Edits, deletions and reactions are emitted with the same format and `"type": "edit"`, `"revoke"` or `"reaction"`, plus `target_message_id` (the message they refer to). An edit carries the new text in `text` (and updates the stored message); a reaction carries the emoji in `reaction` (empty string when it was removed).
+
 ## Send API hardening (fork)
 
 - `WHATSAPP_SEND_TOKEN` (at least 32 characters, different from the bridge token): when set, `/api/send` only accepts this token, so a process that holds the bridge token can read (`/api/download`, `/api/health`) but cannot send. The MCP server uses it for its send tools when it is in its environment.

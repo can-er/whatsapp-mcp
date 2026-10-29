@@ -6,6 +6,7 @@ import (
 	"context"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store/sqlstore"
@@ -60,5 +61,30 @@ func TestChatAllowlistResolvesLID(t *testing.T) {
 	}
 	if a.AllowsChat(nil, lid) {
 		t.Error("without a device store the LID cannot be resolved and must not be allowed")
+	}
+}
+
+// An edit replaces the stored text of the original message
+func TestUpdateMessageContent(t *testing.T) {
+	t.Chdir(t.TempDir())
+	store, err := NewMessageStore()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+
+	chat := "15550000001@s.whatsapp.net"
+	if err := store.StoreChat(chat, "Test", time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.StoreMessage("3EB0ORIGINAL", chat, "15550000001", "typo", time.Now(), false, "", "", "", nil, nil, nil, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.UpdateMessageContent("3EB0ORIGINAL", chat, "fixed"); err != nil {
+		t.Fatal(err)
+	}
+	msgs, err := store.GetMessages(chat, 10)
+	if err != nil || len(msgs) != 1 || msgs[0].Content != "fixed" {
+		t.Fatalf("messages after edit: %+v, %v", msgs, err)
 	}
 }

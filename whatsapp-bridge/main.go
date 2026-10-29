@@ -128,6 +128,12 @@ func (store *MessageStore) StoreMessage(id, chatJID, sender, content string, tim
 	return err
 }
 
+// Replace the text of a stored message after it was edited by its sender
+func (store *MessageStore) UpdateMessageContent(id, chatJID, content string) error {
+	_, err := store.db.Exec("UPDATE messages SET content = ? WHERE id = ? AND chat_jid = ?", content, id, chatJID)
+	return err
+}
+
 // Get messages from a chat
 func (store *MessageStore) GetMessages(chatJID string, limit int) ([]Message, error) {
 	rows, err := store.db.Query(
@@ -441,6 +447,17 @@ func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *ev
 	err := messageStore.StoreChat(chatJID, name, msg.Info.Timestamp)
 	if err != nil {
 		logger.Warnf("Failed to store chat: %v", err)
+	}
+
+	// Edits, deletions and reactions refer to an earlier message: update the stored copy and emit them
+	if kind, target, text, _ := messageUpdate(msg.Message); kind != "" {
+		if kind == "edit" && target != "" {
+			if err := messageStore.UpdateMessageContent(target, chatJID, text); err != nil {
+				logger.Warnf("Failed to store edited message: %v", err)
+			}
+		}
+		sink.Enqueue(msg, name)
+		return
 	}
 
 	// Extract text content
