@@ -416,7 +416,12 @@ func extractMediaInfo(msg *waProto.Message) (mediaType string, filename string, 
 }
 
 // Handle regular incoming messages with media support
-func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *events.Message, logger waLog.Logger) {
+func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *events.Message, allowed *chatAllowlist, logger waLog.Logger) {
+	// Ignore chats outside WHATSAPP_ALLOWED_CHATS: they are neither stored nor logged
+	if !allowed.Allows(msg.Info.Chat) {
+		return
+	}
+
 	// Save message to database
 	chatJID := msg.Info.Chat.String()
 	sender := msg.Info.Sender.User
@@ -688,7 +693,7 @@ func extractDirectPathFromURL(url string) string {
 }
 
 // Build the REST API routes exposing the WhatsApp client functionality
-func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore) *http.ServeMux {
+func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *chatAllowlist) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Handler for sending messages
@@ -713,6 +718,11 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore) *http.Serve
 
 		if req.Message == "" && req.MediaPath == "" {
 			http.Error(w, "Message or media path is required", http.StatusBadRequest)
+			return
+		}
+
+		if !allowed.AllowsString(req.Recipient) {
+			http.Error(w, "Recipient is not in WHATSAPP_ALLOWED_CHATS", http.StatusForbidden)
 			return
 		}
 
@@ -756,6 +766,11 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore) *http.Serve
 			return
 		}
 
+		if !allowed.AllowsString(req.ChatJID) {
+			http.Error(w, "Chat is not in WHATSAPP_ALLOWED_CHATS", http.StatusForbidden)
+			return
+		}
+
 		// Download the media
 		success, mediaType, filename, path, err := downloadMedia(client, messageStore, req.MessageID, req.ChatJID)
 
@@ -790,10 +805,10 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore) *http.Serve
 }
 
 // Start a REST API server to expose the WhatsApp client functionality
-func startRESTServer(client *whatsmeow.Client, messageStore *MessageStore, addr string, token string) {
+func startRESTServer(client *whatsmeow.Client, messageStore *MessageStore, allowed *chatAllowlist, addr string, token string) {
 	server := &http.Server{
 		Addr:              addr,
-		Handler:           requireAPIAuth(token, newAPIMux(client, messageStore)),
+		Handler:           requireAPIAuth(token, newAPIMux(client, messageStore, allowed)),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
@@ -855,16 +870,22 @@ func main() {
 	}
 	defer messageStore.Close()
 
+	// Restrict stored and reachable chats if WHATSAPP_ALLOWED_CHATS is set
+	allowedChats := loadChatAllowlist()
+	if allowedChats != nil {
+		logger.Infof("Chat allowlist enabled: %d chat(s)", len(allowedChats.jids))
+	}
+
 	// Setup event handling for messages and history sync
 	client.AddEventHandler(func(evt interface{}) {
 		switch v := evt.(type) {
 		case *events.Message:
 			// Process regular messages
-			handleMessage(client, messageStore, v, logger)
+			handleMessage(client, messageStore, v, allowedChats, logger)
 
 		case *events.HistorySync:
 			// Process history sync events
-			handleHistorySync(client, messageStore, v, logger)
+			handleHistorySync(client, messageStore, v, allowedChats, logger)
 
 		case *events.Connected:
 			logger.Infof("Connected to WhatsApp")
@@ -934,7 +955,7 @@ func main() {
 	}
 
 	// Start REST API server
-	startRESTServer(client, messageStore, listenAddr(), apiToken)
+	startRESTServer(client, messageStore, allowedChats, listenAddr(), apiToken)
 
 	// Create a channel to keep the main goroutine alive
 	exitChan := make(chan os.Signal, 1)
@@ -1034,7 +1055,7 @@ func GetChatName(client *whatsmeow.Client, messageStore *MessageStore, jid types
 }
 
 // Handle history sync events
-func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, historySync *events.HistorySync, logger waLog.Logger) {
+func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, historySync *events.HistorySync, allowed *chatAllowlist, logger waLog.Logger) {
 	fmt.Printf("Received history sync event with %d conversations\n", len(historySync.Data.Conversations))
 
 	syncedCount := 0
@@ -1050,6 +1071,11 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 		jid, err := types.ParseJID(chatJID)
 		if err != nil {
 			logger.Warnf("Failed to parse JID %s: %v", chatJID, err)
+			continue
+		}
+
+		// Skip chats outside WHATSAPP_ALLOWED_CHATS
+		if !allowed.Allows(jid) {
 			continue
 		}
 
