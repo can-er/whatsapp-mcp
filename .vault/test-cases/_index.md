@@ -20,3 +20,4 @@ tags: [test-case, index]
 - [[TC-11-integration-rapport]] — main du fork vert, PR ouvertes
 - [[TC-12-code-appairage]] — Les codes d'appairage sont livrés, limités en fréquence, puis confirmés
 - [[TC-13-api-history]] — L'historique est paginé, filtré par la liste blanche et au format v1
+- [[TC-14-store-dir]] — Toutes les données vont dans WHATSAPP_STORE_DIR

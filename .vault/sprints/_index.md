@@ -22,3 +22,4 @@ tags: [sprint, index]
 | [[sprint-11-integration-rapport]] | `DONE` | [[TC-11-integration-rapport]] |
 | [[sprint-12-code-appairage]] | `DONE` | [[TC-12-code-appairage]] |
 | [[sprint-13-api-history]] | `DONE` | [[TC-13-api-history]] |
+| [[sprint-14-store-dir]] | `ONGOING` | [[TC-14-store-dir]] |
