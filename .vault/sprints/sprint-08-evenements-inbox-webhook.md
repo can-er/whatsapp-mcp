@@ -2,7 +2,7 @@
 type: sprint
 id: sprint-08
 title: "Événements entrants : dossier inbox + webhook local (fork)"
-status: TODO          # TODO | ONGOING | DONE
+status: ONGOING          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-10-29
 closed:
@@ -11,7 +11,7 @@ tags: [sprint]
 
 # Sprint 08 — Événements entrants : dossier inbox + webhook local (fork)
 
-> **status:: TODO**  ·  **test:: [[TC-08-evenements-inbox-webhook]]**
+> **status:: ONGOING**  ·  **test:: [[TC-08-evenements-inbox-webhook]]**
 
 ## 🎯 Objectif
 

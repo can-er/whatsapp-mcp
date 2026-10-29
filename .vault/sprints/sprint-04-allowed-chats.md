@@ -42,7 +42,8 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-10-29` — Sprint créé.
 - `2026-10-29` — Liste blanche Go (stockage + API) et Python (vues temporaires) ; TC-04 PASS ; mergé dans main.
+- `2026-10-29` — Incident : numéros réels dans les tests → historique réécrit et force-push, garde-fou pre-commit ([[ADR-0007-donnees-de-test-fictives]]).
 
 ## 🔗 Liens
 
-- ADR : —
+- ADR : [[ADR-0007-donnees-de-test-fictives]]

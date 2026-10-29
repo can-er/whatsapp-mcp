@@ -78,7 +78,10 @@ Toute décision structurante → un ADR dans `.vault/decisions/`.
   `bash .vault/tools/gocheck.sh <chemin>/whatsapp-bridge` (build + vet + test, Linux, CGO).
   Tests Python : `cd whatsapp-mcp-server && uv run --with pytest pytest -q tests`.
 - **Ne jamais lancer le pont connecté à un vrai compte WhatsApp** pendant les tests.
-- **Aucun secret** dans le dépôt (`store/`, `*.db`, `bridge_token` sont ignorés).
+- **Aucun secret ni donnée personnelle réelle** dans le dépôt, même dans les tests et exemples
+  ([ADR-0007](.vault/decisions/ADR-0007-donnees-de-test-fictives.md)) : numéros fictifs `1555…`
+  uniquement. Hook `pre-commit` = `.vault/tools/check_no_pii.py --staged` ; lancer
+  `python .vault/tools/check_no_pii.py --history` avant chaque push.
 
 ---
 

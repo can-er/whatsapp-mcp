@@ -27,7 +27,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-05-read-only-mode]] | `DONE` | [[TC-05-read-only-mode]] |
 | [[sprint-06-store-permissions]] | `DONE` | [[TC-06-store-permissions]] |
 | [[sprint-07-bump-whatsmeow]] | `DONE` | [[TC-07-bump-whatsmeow]] |
-| [[sprint-08-evenements-inbox-webhook]] | `TODO` | [[TC-08-evenements-inbox-webhook]] |
+| [[sprint-08-evenements-inbox-webhook]] | `ONGOING` | [[TC-08-evenements-inbox-webhook]] |
 | [[sprint-09-api-envoi-health]] | `TODO` | [[TC-09-api-envoi-health]] |
 | [[sprint-10-evenements-edit-revoke-reaction]] | `TODO` | [[TC-10-evenements-edit-revoke-reaction]] |
 | [[sprint-11-integration-rapport]] | `TODO` | [[TC-11-integration-rapport]] |
@@ -44,6 +44,7 @@ Navigation par liens `[[...]]`.
 - [[ADR-0004-auth-pont-jeton]] — Authentification du pont par jeton Bearer partagé
 - [[ADR-0005-envoi-media-desactive-par-defaut]] — Envoi de médias désactivé tant que WHATSAPP_MEDIA_DIR n'est pas défini
 - [[ADR-0006-interface-pont-pipeline]] — Interface pont WhatsApp → pipeline KS (événements v1, API d'envoi)
+- [[ADR-0007-donnees-de-test-fictives]] — Données de test fictives et garde-fou pre-commit (incident numéros réels)
 
 ## 🧩 Templates
 
