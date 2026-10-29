@@ -13,6 +13,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"syscall"
@@ -620,17 +621,12 @@ func downloadMedia(client *whatsmeow.Client, messageStore *MessageStore, message
 		return false, "", "", "", fmt.Errorf("not a media message")
 	}
 
-	// Rows stored by older versions may hold a sender-controlled name: sanitize it again
-	filename = sanitizeFilename(filename)
-	if filename == "" {
-		filename = mediaType + "_" + sanitizeFilename(messageID)
-	}
-
 	// Generate a local path for the file, guaranteed to stay inside the chat directory
-	chatDir, localPath, err := mediaFilePath("store", chatJID, filename)
+	chatDir, localPath, err := localMediaPath(chatJID, mediaType, messageID, filename)
 	if err != nil {
 		return false, "", "", "", err
 	}
+	filename = filepath.Base(localPath)
 
 	// Create directory for the chat if it doesn't exist
 	if err := ensurePrivateDir(chatDir); err != nil {
@@ -778,6 +774,60 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *ch
 			MessageID: rec.MessageID,
 			Duplicate: duplicate,
 		})
+	})
+
+	// Handler for the stored history of an allowed chat
+	mux.HandleFunc("/api/history", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		query := r.URL.Query()
+		chat := query.Get("chat_jid")
+		if chat == "" {
+			http.Error(w, "chat_jid is required", http.StatusBadRequest)
+			return
+		}
+		if !allowed.AllowsChatString(client, chat) {
+			http.Error(w, "Chat is not in WHATSAPP_ALLOWED_CHATS", http.StatusForbidden)
+			return
+		}
+		limit := defaultHistoryLimit
+		if raw := query.Get("limit"); raw != "" {
+			n, err := strconv.Atoi(raw)
+			if err != nil || n < 1 || n > maxHistoryLimit {
+				http.Error(w, fmt.Sprintf("limit must be between 1 and %d", maxHistoryLimit), http.StatusBadRequest)
+				return
+			}
+			limit = n
+		}
+		before, err := parseHistoryCursor(query.Get("before"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		jids := historyChatJIDs(client, chat)
+		if messageStore == nil || len(jids) == 0 {
+			http.Error(w, "History unavailable", http.StatusServiceUnavailable)
+			return
+		}
+
+		page, next, err := messageStore.HistoryPage(jids, before, limit)
+		if err != nil {
+			http.Error(w, "Failed to read history", http.StatusInternalServerError)
+			return
+		}
+		resp := historyResponse{Messages: make([]*MessageEvent, 0, len(page))}
+		resolve := clientLIDResolver(client)
+		for _, m := range page {
+			resp.Messages = append(resp.Messages, historyEvent(m, resolve))
+		}
+		if next != nil {
+			cursor := next.encode()
+			resp.NextBefore = &cursor
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
 	})
 
 	// Handler for the bridge status
