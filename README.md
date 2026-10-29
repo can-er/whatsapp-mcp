@@ -121,6 +121,16 @@ The bridge exposes a small REST API (`/api/send`, `/api/download`) used by the M
 
 `send_file` and `send_audio_message` can only send files located in the folder named by `WHATSAPP_MEDIA_DIR` (symlinks are resolved, so a link pointing outside the folder is refused). Set the same value for the bridge and the MCP server. When it is not set, sending files is disabled; text messages still work. Audio converted by ffmpeg is written to that folder temporarily and deleted after sending.
 
+### Restricting chats
+
+By default every chat (including the synced history) is stored and readable by the MCP server. To limit the bridge to specific chats, set `WHATSAPP_ALLOWED_CHATS` to a comma-separated list of JIDs or phone numbers with country code, for both the bridge and the MCP server:
+
+```bash
+export WHATSAPP_ALLOWED_CHATS="15550000003,+1 555 000 0004,120363000000000000@g.us"
+```
+
+Other chats are then not stored, are hidden from the MCP tools (even if they were stored before), and cannot be used with `/api/send` or `/api/download`.
+
 ### Downloaded media
 
 File names of received documents are chosen by the sender, so the bridge reduces them to a single safe file name (no directories, `..`, control characters or Windows reserved names) before saving media under `whatsapp-bridge/store/<chat>/`.

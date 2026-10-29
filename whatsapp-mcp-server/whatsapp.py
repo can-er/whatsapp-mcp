@@ -54,6 +54,38 @@ def resolve_media_path(media_path: str) -> str:
         raise ValueError(f"Media file not found: {media_path}")
     return path
 
+
+def allowed_chat_jids() -> Optional[List[str]]:
+    """Chat JIDs listed in WHATSAPP_ALLOWED_CHATS (comma-separated JIDs or phone numbers), or None when every chat is allowed."""
+    jids = []
+    for entry in os.environ.get("WHATSAPP_ALLOWED_CHATS", "").split(","):
+        entry = entry.strip().replace(" ", "")
+        if not entry:
+            continue
+        if "@" not in entry:
+            entry = entry.lstrip("+") + "@s.whatsapp.net"
+        user, server = entry.split("@", 1)
+        user = user.split(":", 1)[0]
+        if user and server and "@" not in server:
+            jids.append(f"{user}@{server}")
+    return jids or None
+
+
+def connect_messages_db() -> sqlite3.Connection:
+    """Open the message database, hiding chats outside WHATSAPP_ALLOWED_CHATS.
+
+    When an allowlist is set, temporary views named chats and messages shadow the real tables
+    (SQLite resolves unqualified names in the temp schema first), so every query only sees allowed chats.
+    """
+    conn = sqlite3.connect(MESSAGES_DB_PATH)
+    allowed = allowed_chat_jids()
+    if allowed is not None:
+        conn.execute("CREATE TEMP TABLE allowed_chat_jids (jid TEXT PRIMARY KEY)")
+        conn.executemany("INSERT OR IGNORE INTO temp.allowed_chat_jids (jid) VALUES (?)", [(jid,) for jid in allowed])
+        conn.execute("CREATE TEMP VIEW chats AS SELECT * FROM main.chats WHERE jid IN (SELECT jid FROM temp.allowed_chat_jids)")
+        conn.execute("CREATE TEMP VIEW messages AS SELECT * FROM main.messages WHERE chat_jid IN (SELECT jid FROM temp.allowed_chat_jids)")
+    return conn
+
 @dataclass
 class Message:
     timestamp: datetime
@@ -93,7 +125,7 @@ class MessageContext:
 
 def get_sender_name(sender_jid: str) -> str:
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         # First try matching by exact JID
@@ -179,7 +211,7 @@ def list_messages(
 ) -> List[Message]:
     """Get messages matching the specified criteria with optional context."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         # Build base query
@@ -274,7 +306,7 @@ def get_message_context(
 ) -> MessageContext:
     """Get context around a specific message."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         # Get the target message first
@@ -369,7 +401,7 @@ def list_chats(
 ) -> List[Chat]:
     """Get chats matching the specified criteria."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         # Build base query
@@ -437,7 +469,7 @@ def list_chats(
 def search_contacts(query: str) -> List[Contact]:
     """Search contacts by name or phone number."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         # Split query into characters to support partial matching
@@ -485,7 +517,7 @@ def get_contact_chats(jid: str, limit: int = 20, page: int = 0) -> List[Chat]:
         page: Page number for pagination (default 0)
     """
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         cursor.execute("""
@@ -530,7 +562,7 @@ def get_contact_chats(jid: str, limit: int = 20, page: int = 0) -> List[Chat]:
 def get_last_interaction(jid: str) -> str:
     """Get most recent message involving the contact."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         cursor.execute("""
@@ -579,7 +611,7 @@ def get_last_interaction(jid: str) -> str:
 def get_chat(chat_jid: str, include_last_message: bool = True) -> Optional[Chat]:
     """Get chat metadata by JID."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         query = """
@@ -627,7 +659,7 @@ def get_chat(chat_jid: str, include_last_message: bool = True) -> Optional[Chat]
 def get_direct_chat_by_contact(sender_phone_number: str) -> Optional[Chat]:
     """Get chat metadata by sender phone number."""
     try:
-        conn = sqlite3.connect(MESSAGES_DB_PATH)
+        conn = connect_messages_db()
         cursor = conn.cursor()
         
         cursor.execute("""

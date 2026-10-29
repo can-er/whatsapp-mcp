@@ -89,7 +89,7 @@ func TestBridgeTokenEnvOverride(t *testing.T) {
 // Requests rejected by the API must never reach the WhatsApp client: the real routes are
 // served with a nil client and nil store, so any rejected request reaching them would panic.
 func TestAPIRejectsUnsafeRequests(t *testing.T) {
-	handler := requireAPIAuth(testToken, newAPIMux(nil, nil))
+	handler := requireAPIAuth(testToken, newAPIMux(nil, nil, nil))
 	validBody := `{"recipient":"123","message":"hi"}`
 
 	tests := []struct {
