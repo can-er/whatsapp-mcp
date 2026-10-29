@@ -419,7 +419,7 @@ func extractMediaInfo(msg *waProto.Message) (mediaType string, filename string, 
 }
 
 // Handle regular incoming messages with media support
-func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *events.Message, allowed *chatAllowlist, logger waLog.Logger) {
+func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *events.Message, allowed *chatAllowlist, sink *eventSink, logger waLog.Logger) {
 	// Ignore chats outside WHATSAPP_ALLOWED_CHATS: they are neither stored nor logged
 	if !allowed.AllowsChat(client, msg.Info.Chat) {
 		return
@@ -465,6 +465,9 @@ func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *ev
 		fileEncSHA256,
 		fileLength,
 	)
+
+	// Emit the message to the inbox / webhook for local automation (no-op when not configured)
+	sink.Enqueue(msg, name)
 
 	if err != nil {
 		logger.Warnf("Failed to store message: %v", err)
@@ -883,12 +886,26 @@ func main() {
 		logger.Infof("Chat allowlist enabled: %d chat(s)", len(allowedChats.jids))
 	}
 
+	// Emit real-time messages to WHATSAPP_INBOX_DIR / WHATSAPP_EVENT_WEBHOOK_URL if configured
+	eventSink, err := newEventSinkFromEnv(client)
+	if err != nil {
+		logger.Errorf("Invalid event configuration: %v", err)
+		return
+	}
+	if eventSink != nil {
+		if allowedChats == nil {
+			logger.Warnf("Message events are enabled for every chat; set WHATSAPP_ALLOWED_CHATS to limit them")
+		}
+		eventSink.Start(context.Background())
+		logger.Infof("Message events enabled (inbox: %q, webhook: %t)", eventSink.inboxDir, eventSink.webhookURL != "")
+	}
+
 	// Setup event handling for messages and history sync
 	client.AddEventHandler(func(evt interface{}) {
 		switch v := evt.(type) {
 		case *events.Message:
 			// Process regular messages
-			handleMessage(client, messageStore, v, allowedChats, logger)
+			handleMessage(client, messageStore, v, allowedChats, eventSink, logger)
 
 		case *events.HistorySync:
 			// Process history sync events
