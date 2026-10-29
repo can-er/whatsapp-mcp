@@ -2,15 +2,15 @@
 type: test-case
 id: TC-03-download-path-traversal
 sprint: sprint-03
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-03 — Aucun nom malveillant ne sort du dossier du chat
 
-> **sprint:: [[sprint-03-download-path-traversal]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-03-download-path-traversal]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -28,7 +28,10 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/03-download-path-traversal`, commit `4f5227f`)
+- `TestSanitizeFilename` : 21 cas + troncature UTF-8 (`../../evil.sh`→`evil.sh`, `..\..\evil.bat`→`evil.bat`, `C:\Windows\win.ini`→`win.ini`, `..`→vide, `CON`→`_CON`, octet nul et U+202E supprimés…).
+- `TestMediaFilePathStaysInChatDir` : 4 JID (dont `../../outside`) × 8 noms → chaque chemin est un enfant direct de `store/<chat>` ; noms vides / `..` refusés.
+- Exécuté sous Linux (`gocheck.sh`, `GOCHECK_OK`) **et** en natif Windows (`CGO_ENABLED=0 go test`).
 
 ## Commande(s)
 

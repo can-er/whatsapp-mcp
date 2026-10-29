@@ -22,7 +22,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-00-initialisation]] | `DONE` | [[TC-00-initialisation]] |
 | [[sprint-01-api-rest-auth]] | `DONE` | [[TC-01-api-rest-auth]] |
 | [[sprint-02-media-path-allowlist]] | `DONE` | [[TC-02-media-path-allowlist]] |
-| [[sprint-03-download-path-traversal]] | `TODO` | [[TC-03-download-path-traversal]] |
+| [[sprint-03-download-path-traversal]] | `DONE` | [[TC-03-download-path-traversal]] |
 | [[sprint-04-allowed-chats]] | `TODO` | [[TC-04-allowed-chats]] |
 | [[sprint-05-read-only-mode]] | `TODO` | [[TC-05-read-only-mode]] |
 | [[sprint-06-store-permissions]] | `TODO` | [[TC-06-store-permissions]] |
