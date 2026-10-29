@@ -28,7 +28,7 @@ if a.status == "DONE":
     t = t.replace("- [ ] ", "- [x] ")
 if a.log:
     t = re.sub(r"(## 🧾 Journal\n\n(?:- .*\n)*)", lambda m: m.group(1) + f"- `{today}` — {a.log}\n", t, count=1)
-sp.write_text(t, encoding="utf-8")
+sp.write_text(t, encoding="utf-8", newline=chr(10))
 
 if a.tc:
     tc = next((V / "test-cases").glob(f"TC-{a.n}-*.md"))
@@ -39,11 +39,11 @@ if a.tc:
     if a.result:
         body = Path(a.result).read_text(encoding="utf-8").strip()
         u = re.sub(r"(## Résultat obtenu\n\n).*?(\n## )", lambda m: m.group(1) + body + "\n" + m.group(2), u, count=1, flags=re.S)
-    tc.write_text(u, encoding="utf-8")
+    tc.write_text(u, encoding="utf-8", newline=chr(10))
 
 for f in (V / "Home.md", V / "sprints" / "_index.md"):
     h = f.read_text(encoding="utf-8")
     h = re.sub(rf"(\| \[\[{re.escape(slug)}\]\] \| )`\w+`", rf"\1`{a.status}`", h)
     h = re.sub(r"^updated:.*$", f"updated: {today}", h, count=1, flags=re.M)
-    f.write_text(h, encoding="utf-8")
+    f.write_text(h, encoding="utf-8", newline=chr(10))
 print(f"{slug} -> {a.status}" + (f", TC -> {a.tc}" if a.tc else ""))

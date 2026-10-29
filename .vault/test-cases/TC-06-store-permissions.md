@@ -2,15 +2,15 @@
 type: test-case
 id: TC-06-store-permissions
 sprint: sprint-06
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-06 — store/ en 0700, fichiers en 0600
 
-> **sprint:: [[sprint-06-store-permissions]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-06-store-permissions]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -28,7 +28,11 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/06-store-permissions` basée sur `upstream/main`, commit `ca8f262`)
+- Linux (`gocheck.sh`, umask 022) : `TestEnsurePrivateDir`, `TestEnsurePrivateFile`, `TestEnsurePrivateMessageStore` PASS — `store/` 0755 préexistant → 0700 ; `messages.db`, `-wal`, `-shm` en 0600 (vrai SQLite, mode WAL) ; contenu préservé. `GOCHECK_OK`.
+- Windows natif : les 3 tests sont `SKIP` (modes POSIX non applicables), `go vet` OK.
+- Après merge dans `main` (01-06) : 13 tests Go + 30 tests Python PASS.
+- PR upstream : https://github.com/lharries/whatsapp-mcp/pull/389
 
 ## Commande(s)
 
