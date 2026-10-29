@@ -2,15 +2,15 @@
 type: test-case
 id: TC-04-allowed-chats
 sprint: sprint-04
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-04 — Les conversations hors liste blanche sont ignorées et masquées
 
-> **sprint:: [[sprint-04-allowed-chats]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-04-allowed-chats]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -29,7 +29,9 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/04-allowed-chats`, commit `39b8945`)
+- Go : `TestChatAllowlistParsing` (numéro avec +/espaces, JID, groupe, appareil lié `:3`, entrée invalide ignorée, liste vide = tout autorisé) et `TestChatAllowlistAPI` (`/api/send` et `/api/download` → 403 hors liste, client nil jamais touché) PASS ; suite complète 10 tests, `GOCHECK_OK`.
+- Python `tests/test_allowed_chats.py` : base SQLite temporaire (Alice autorisée, Bob et un groupe masqués) → les 9 fonctions de lecture ne voient qu'Alice, pour 4 notations de la liste ; sans variable, les 3 chats sont visibles ; le fichier .db n'est pas modifié. 19 passed (avec test_media_path).
 
 ## Commande(s)
 

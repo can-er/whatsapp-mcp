@@ -2,16 +2,16 @@
 type: sprint
 id: sprint-04
 title: "Liste blanche de conversations (WHATSAPP_ALLOWED_CHATS)"
-status: TODO          # TODO | ONGOING | DONE
+status: DONE          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-10-29
-closed:
+closed: 2026-10-29
 tags: [sprint]
 ---
 
 # Sprint 04 — Liste blanche de conversations (WHATSAPP_ALLOWED_CHATS)
 
-> **status:: TODO**  ·  **test:: [[TC-04-allowed-chats]]**
+> **status:: DONE**  ·  **test:: [[TC-04-allowed-chats]]**
 
 ## 🎯 Objectif
 
@@ -19,10 +19,10 @@ Si `WHATSAPP_ALLOWED_CHATS` est défini, les conversations hors liste ne sont ni
 
 ## 📋 Tâches
 
-- [ ] Go : parsing (JID ou numéro), `Allows(jid)`
-- [ ] Go : filtre dans `handleMessage` / `handleHistorySync`, refus dans `/api/send` et `/api/download`
-- [ ] Python : filtre SQL dans toutes les requêtes de lecture
-- [ ] README
+- [x] Go : parsing (JID ou numéro), `Allows(jid)`
+- [x] Go : filtre dans `handleMessage` / `handleHistorySync`, refus dans `/api/send` et `/api/download`
+- [x] Python : filtre SQL dans toutes les requêtes de lecture
+- [x] README
 
 ## 🧪 Test associé (obligatoire)
 
@@ -32,15 +32,16 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 ## ✅ Definition of Done
 
-- [ ] Tâches terminées
-- [ ] Test [[TC-04-allowed-chats]] **PASS**
-- [ ] Commit fait, message préfixé `[Sprint 04]`
-- [ ] Statut de ce sprint passé à `DONE` + Home.md mis à jour
-- [ ] Bip Windows émis
+- [x] Tâches terminées
+- [x] Test [[TC-04-allowed-chats]] **PASS**
+- [x] Commit fait, message préfixé `[Sprint 04]`
+- [x] Statut de ce sprint passé à `DONE` + Home.md mis à jour
+- [x] Bip Windows émis
 
 ## 🧾 Journal
 
 - `2026-10-29` — Sprint créé.
+- `2026-10-29` — Liste blanche Go (stockage + API) et Python (vues temporaires) ; TC-04 PASS ; mergé dans main.
 
 ## 🔗 Liens
 
