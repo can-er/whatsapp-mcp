@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"os"
 	"strings"
 
+	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/types"
 )
 
@@ -58,11 +60,29 @@ func (a *chatAllowlist) Allows(jid types.JID) bool {
 	return a.jids[jid.ToNonAD().String()]
 }
 
-// AllowsString is Allows for a JID or phone number given as a string
-func (a *chatAllowlist) AllowsString(chat string) bool {
+// AllowsChat is Allows for a chat that may be addressed by its LID (hidden user ID): the phone
+// number the LID maps to in the device store is checked as well, so listing phone numbers works
+// for LID-addressed chats too.
+func (a *chatAllowlist) AllowsChat(client *whatsmeow.Client, jid types.JID) bool {
+	if a.Allows(jid) {
+		return true
+	}
+	if jid.Server != types.HiddenUserServer || client == nil || client.Store == nil || client.Store.LIDs == nil {
+		return false
+	}
+	pn, err := client.Store.LIDs.GetPNForLID(context.Background(), jid.ToNonAD())
+	return err == nil && !pn.IsEmpty() && a.Allows(pn)
+}
+
+// AllowsChatString is AllowsChat for a JID or phone number given as a string
+func (a *chatAllowlist) AllowsChatString(client *whatsmeow.Client, chat string) bool {
 	if a == nil {
 		return true
 	}
-	jid, ok := normalizeChatJID(chat)
-	return ok && a.jids[jid]
+	normalized, ok := normalizeChatJID(chat)
+	if !ok {
+		return false
+	}
+	jid, err := types.ParseJID(normalized)
+	return err == nil && a.AllowsChat(client, jid)
 }
