@@ -56,7 +56,7 @@ type MessageEvent struct {
 	SenderName      string      `json:"sender_name"`
 	IsFromMe        bool        `json:"is_from_me"`
 	Timestamp       time.Time   `json:"timestamp"`
-	ReceivedAt      time.Time   `json:"received_at"`
+	ReceivedAt      *time.Time  `json:"received_at"` // null for stored history
 	Text            string      `json:"text"`
 	QuotedMessageID *string     `json:"quoted_message_id"`
 	Media           *EventMedia `json:"media"`
@@ -222,10 +222,11 @@ func buildMessageEvent(evt *events.Message, chatName string, resolve lidResolver
 		SenderName:      info.PushName,
 		IsFromMe:        info.IsFromMe,
 		Timestamp:       info.Timestamp.UTC(),
-		ReceivedAt:      receivedAt.UTC(),
 		Text:            messageText(evt.Message),
 		QuotedMessageID: optionalString(quotedMessageID(evt.Message)),
 	}
+	received := receivedAt.UTC()
+	ev.ReceivedAt = &received
 	if !chatLID.IsEmpty() {
 		ev.ChatLID = optionalString(chatLID.String())
 	}

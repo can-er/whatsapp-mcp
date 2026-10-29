@@ -63,6 +63,17 @@ func sanitizeFilename(name string) string {
 	return name
 }
 
+// localMediaPath returns where the media of a stored message is (or will be) downloaded.
+// Rows stored by older versions may hold a sender-controlled name, so it is sanitized again, with a
+// name generated from the message ID as fallback.
+func localMediaPath(chatJID, mediaType, messageID, filename string) (string, string, error) {
+	filename = sanitizeFilename(filename)
+	if filename == "" {
+		filename = mediaType + "_" + sanitizeFilename(messageID)
+	}
+	return mediaFilePath("store", chatJID, filename)
+}
+
 // mediaFilePath returns the directory for a chat's media under storeDir and the path of the
 // given file in it. Both the chat JID and the file name are sanitized, and the result is
 // guaranteed to be a direct child of the chat directory.
