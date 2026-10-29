@@ -32,7 +32,7 @@ func TestPairingCodeDeliveredToInboxAndWebhook(t *testing.T) {
 	sink := newTestSink(t, nil)
 	sink.webhookURL = server.URL
 	clock := testNow
-	n := newPairingNotifier(sink, "+1 555 000 0001")
+	n := newPairingNotifier(sink, "+1 555 000 0001", 5)
 	n.now = func() time.Time { return clock }
 
 	if err := n.CodeReady("ABCD-EFGH"); err != nil {
@@ -82,7 +82,7 @@ func TestPairingCodeDeliveredToInboxAndWebhook(t *testing.T) {
 
 func TestPairingCodeMinInterval(t *testing.T) {
 	clock := testNow
-	n := newPairingNotifier(nil, "15550000001")
+	n := newPairingNotifier(nil, "15550000001", 5)
 	n.now = func() time.Time { return clock }
 
 	if !n.ShouldRequestCode() {

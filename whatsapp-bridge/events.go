@@ -386,8 +386,14 @@ func (s *eventSink) Enqueue(evt *events.Message, chatName string) {
 }
 
 // writeAtomic writes data to dir/name through the inbox tmp directory, so watchers of dir only
-// ever see complete files (inotify IN_MOVED_TO).
+// ever see complete files (inotify IN_MOVED_TO). Missing sub-directories (removed while the bridge
+// runs) are created again.
 func (s *eventSink) writeAtomic(dir, name string, data []byte) (string, error) {
+	for _, sub := range []string{"tmp", dir} {
+		if err := os.MkdirAll(filepath.Join(s.inboxDir, sub), 0750); err != nil {
+			return "", err
+		}
+	}
 	tmp, err := os.CreateTemp(filepath.Join(s.inboxDir, "tmp"), name+".*.tmp")
 	if err != nil {
 		return "", err
@@ -453,17 +459,19 @@ func (s *eventSink) Process(ctx context.Context, evt *events.Message, chatName s
 	return ev, nil
 }
 
-// deliver writes an event to the inbox (if configured) and posts it to the webhook (if configured)
+// deliver writes an event to the inbox (if configured) and posts it to the webhook (if configured).
+// A failed inbox write does not prevent the webhook notification.
 func (s *eventSink) deliver(name string, body []byte) error {
+	var err error
 	if s.inboxDir != "" {
-		if _, err := s.writeAtomic("events", name, body); err != nil {
-			return fmt.Errorf("failed to write event: %v", err)
+		if _, werr := s.writeAtomic("events", name, body); werr != nil {
+			err = fmt.Errorf("failed to write event %s in %s: %v", name, filepath.Join(s.inboxDir, "events"), werr)
 		}
 	}
 	if s.webhookURL != "" {
 		go s.notify(body)
 	}
-	return nil
+	return err
 }
 
 // notify posts the event to the webhook, retrying a few times; the inbox stays the durable record

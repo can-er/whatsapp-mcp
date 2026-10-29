@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -1021,10 +1022,21 @@ func main() {
 		// a pairing code delivered as an event when WHATSAPP_PAIR_PHONE is set
 		var notifier *pairingNotifier
 		if phone := strings.TrimSpace(os.Getenv("WHATSAPP_PAIR_PHONE")); phone != "" {
-			notifier = newPairingNotifier(eventSink, phone)
+			notifier = newPairingNotifier(eventSink, phone, pairMaxCodes())
+			if eventSink == nil {
+				logger.Warnf("WHATSAPP_PAIR_PHONE is set but neither WHATSAPP_INBOX_DIR nor WHATSAPP_EVENT_WEBHOOK_URL: pairing codes are only printed here")
+			} else {
+				logger.Infof("Pairing codes will be delivered as events (inbox: %q, webhook: %t), at most %d requests",
+					eventSink.inboxDir, eventSink.webhookURL != "", notifier.maxRequests)
+			}
 		}
 		if err := pairDevice(context.Background(), client, notifier, pairTimeout(), logger); err != nil {
 			logger.Errorf("Failed to pair: %v", err)
+			if errors.Is(err, errPairingStopped) {
+				// Dedicated status so the service manager does not restart pairing on its own
+				messageStore.Close()
+				os.Exit(exitPairingStopped)
+			}
 			return
 		}
 		fmt.Println("\nSuccessfully connected and authenticated!")
