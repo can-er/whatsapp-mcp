@@ -49,13 +49,13 @@ func TestChatAllowlistParsing(t *testing.T) {
 		"":                           false,
 		"../../etc":                  false,
 	} {
-		if got := a.AllowsString(chat); got != want {
-			t.Errorf("AllowsString(%q) = %v, want %v", chat, got, want)
+		if got := a.AllowsChatString(nil, chat); got != want {
+			t.Errorf("AllowsChatString(%q) = %v, want %v", chat, got, want)
 		}
 	}
 
 	var everyone *chatAllowlist
-	if !everyone.Allows(types.NewJID("1", types.DefaultUserServer)) || !everyone.AllowsString("1") {
+	if !everyone.Allows(types.NewJID("1", types.DefaultUserServer)) || !everyone.AllowsChatString(nil, "1") {
 		t.Fatal("nil allowlist must allow every chat")
 	}
 }
