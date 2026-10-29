@@ -446,16 +446,23 @@ func (s *eventSink) Process(ctx context.Context, evt *events.Message, chatName s
 	if err != nil {
 		return nil, err
 	}
+	if err := s.deliver(ev.Timestamp.Format("20060102T150405Z")+"_"+idPart+".json", body); err != nil {
+		return nil, err
+	}
+	return ev, nil
+}
+
+// deliver writes an event to the inbox (if configured) and posts it to the webhook (if configured)
+func (s *eventSink) deliver(name string, body []byte) error {
 	if s.inboxDir != "" {
-		name := ev.Timestamp.Format("20060102T150405Z") + "_" + idPart + ".json"
 		if _, err := s.writeAtomic("events", name, body); err != nil {
-			return nil, fmt.Errorf("failed to write event: %v", err)
+			return fmt.Errorf("failed to write event: %v", err)
 		}
 	}
 	if s.webhookURL != "" {
 		go s.notify(body)
 	}
-	return ev, nil
+	return nil
 }
 
 // notify posts the event to the webhook, retrying a few times; the inbox stays the durable record

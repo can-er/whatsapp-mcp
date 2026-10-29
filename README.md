@@ -201,6 +201,16 @@ Event format (version 1):
 
 Edits, deletions and reactions are emitted with the same format and `"type": "edit"`, `"revoke"` or `"reaction"`, plus `target_message_id` (the message they refer to). An edit carries the new text in `text` (and updates the stored message); a reaction carries the emoji in `reaction` (empty string when it was removed).
 
+### Pairing by code (fork)
+
+Set `WHATSAPP_PAIR_PHONE` to the account's phone number (country code, digits) to link a new device without scanning a QR code. The bridge requests a pairing code (enter it in WhatsApp > Linked devices > Link with phone number), prints it, and delivers it through the inbox and the webhook:
+
+```json
+{"version": 1, "type": "pairing_code", "id": "pair-20261029T093002Z", "code": "ABCD-EFGH", "expires_at": "2026-10-29T09:32:42Z", "phone_hint": "…01"}
+```
+
+Only the last two digits of the number are included. WhatsApp closes the login session after about 160 seconds; the bridge then opens a new one with a new code (never more than one code per 60 seconds) until the device is linked or `WHATSAPP_PAIR_TIMEOUT_MINUTES` (default 30) expires. A `{"version": 1, "type": "paired", "id": "paired-…"}` event confirms the link.
+
 ## Send API hardening (fork)
 
 - `WHATSAPP_SEND_TOKEN` (at least 32 characters, different from the bridge token): when set, `/api/send` only accepts this token, so a process that holds the bridge token can read (`/api/download`, `/api/health`) but cannot send. The MCP server uses it for its send tools when it is in its environment.
