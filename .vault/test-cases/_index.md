@@ -18,3 +18,5 @@ tags: [test-case, index]
 - [[TC-09-api-envoi-health]] — Envoi idempotent, audité, réservé au jeton d'envoi ; health OK
 - [[TC-10-evenements-edit-revoke-reaction]] — Edit / revoke / reaction produisent le bon type d'événement
 - [[TC-11-integration-rapport]] — main du fork vert, PR ouvertes
+- [[TC-12-code-appairage]] — Les codes d'appairage sont livrés, limités en fréquence, puis confirmés
+- [[TC-13-api-history]] — L'historique est paginé, filtré par la liste blanche et au format v1
