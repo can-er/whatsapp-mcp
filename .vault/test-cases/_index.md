@@ -21,3 +21,4 @@ tags: [test-case, index]
 - [[TC-12-code-appairage]] — Les codes d'appairage sont livrés, limités en fréquence, puis confirmés
 - [[TC-13-api-history]] — L'historique est paginé, filtré par la liste blanche et au format v1
 - [[TC-14-store-dir]] — Toutes les données vont dans WHATSAPP_STORE_DIR
+- [[TC-15-appairage-robuste]] — L'appairage livre toujours ses événements et s'arrête proprement
