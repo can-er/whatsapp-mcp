@@ -403,7 +403,8 @@ func extractMediaInfo(msg *waProto.Message) (mediaType string, filename string, 
 
 	// Check for document message
 	if doc := msg.GetDocumentMessage(); doc != nil {
-		filename := doc.GetFileName()
+		// The document name is chosen by the sender: never use it as a path
+		filename := sanitizeFilename(doc.GetFileName())
 		if filename == "" {
 			filename = "document_" + time.Now().Format("20060102_150405")
 		}
@@ -567,10 +568,6 @@ func downloadMedia(client *whatsmeow.Client, messageStore *MessageStore, message
 	var fileLength uint64
 	var err error
 
-	// First, check if we already have this file
-	chatDir := fmt.Sprintf("store/%s", strings.ReplaceAll(chatJID, ":", "_"))
-	localPath := ""
-
 	// Get media info from the database
 	mediaType, filename, url, mediaKey, fileSHA256, fileEncSHA256, fileLength, err = messageStore.GetMediaInfo(messageID, chatJID)
 
@@ -591,13 +588,22 @@ func downloadMedia(client *whatsmeow.Client, messageStore *MessageStore, message
 		return false, "", "", "", fmt.Errorf("not a media message")
 	}
 
+	// Rows stored by older versions may hold a sender-controlled name: sanitize it again
+	filename = sanitizeFilename(filename)
+	if filename == "" {
+		filename = mediaType + "_" + sanitizeFilename(messageID)
+	}
+
+	// Generate a local path for the file, guaranteed to stay inside the chat directory
+	chatDir, localPath, err := mediaFilePath("store", chatJID, filename)
+	if err != nil {
+		return false, "", "", "", err
+	}
+
 	// Create directory for the chat if it doesn't exist
 	if err := os.MkdirAll(chatDir, 0755); err != nil {
 		return false, "", "", "", fmt.Errorf("failed to create chat directory: %v", err)
 	}
-
-	// Generate a local path for the file
-	localPath = fmt.Sprintf("%s/%s", chatDir, filename)
 
 	// Get absolute path
 	absPath, err := filepath.Abs(localPath)
