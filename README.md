@@ -209,7 +209,15 @@ Set `WHATSAPP_PAIR_PHONE` to the account's phone number (country code, digits) t
 {"version": 1, "type": "pairing_code", "id": "pair-20261029T093002Z", "code": "ABCD-EFGH", "expires_at": "2026-10-29T09:32:42Z", "phone_hint": "…01"}
 ```
 
-Only the last two digits of the number are included. WhatsApp closes the login session after about 160 seconds; the bridge then opens a new one with a new code (never more than one code per 60 seconds) until the device is linked or `WHATSAPP_PAIR_TIMEOUT_MINUTES` (default 30) expires. A `{"version": 1, "type": "paired", "id": "paired-…"}` event confirms the link.
+Only the last two digits of the number are included. WhatsApp closes the login session after about 160 seconds; the bridge then opens a new one with a new code (never more than one code per 60 seconds) until the device is linked. A `{"version": 1, "type": "paired", "id": "paired-…"}` event confirms the link.
+
+Requesting codes for a long time gets the number rate-limited by WhatsApp, so pairing is bounded:
+
+- at most `WHATSAPP_PAIR_MAX_CODES` code requests (default 5, about 13 minutes), successful or not, and at most `WHATSAPP_PAIR_TIMEOUT_MINUTES` (default 30);
+- after a failed request the bridge waits 5 minutes before the next one; each rate-limit answer (`429 rate-overlimit`) doubles the delay, up to one hour;
+- when it gives up, the bridge delivers `{"version": 1, "type": "pairing_stopped", "id": "pairing-stopped-…", "reason": "max_codes" | "timeout" | "rate_limited", "phone_hint": "…01"}` and exits with status **3**. Under systemd, set `RestartPreventExitStatus=3` so it is not restarted automatically, and start the service again when the phone is at hand.
+
+If an event cannot be written to the inbox, it is still posted to the webhook; inbox sub-directories removed while the bridge runs are created again.
 
 ## Send API hardening (fork)
 
