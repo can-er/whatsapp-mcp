@@ -2,15 +2,15 @@
 type: test-case
 id: TC-08-evenements-inbox-webhook
 sprint: sprint-08
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-08 — Un message autorisé produit média + événement JSON + appel webhook
 
-> **sprint:: [[sprint-08-evenements-inbox-webhook]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-08-evenements-inbox-webhook]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -31,7 +31,12 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** (branche `fix/08-evenements-inbox-webhook`, commit `3f7c9db`)
+- `TestEventTextMessage` : JSON v1 complet et conforme, nom `20261029T093000Z_<id>.json`, aucun fichier tmp résiduel, mode 0640.
+- `TestEventLIDSenderResolvedToPhone` : chat/sender LID → `chat_jid`/`sender_phone` au format numéro + `chat_lid`/`sender_lid` ; LID inconnu → `sender_phone=null`.
+- `TestEventMediaWrittenBeforeEvent` : média écrit avant l'événement, sha256 / voice / duration_s / chemin absolu corrects. `TestEventMediaDownloadFailure` : `status=failed`, `path=null`, aucun fichier.
+- `TestWebhookRetriesWithToken` : 503, 503 puis 204 → 3 appels, Bearer + JSON. `TestWebhookURLMustBeLoopback` : URL non loopback refusée au démarrage. `TestInboxRetentionPurge` : >30 j et tmp >1 h supprimés, récent conservé.
+- Suite complète `GOCHECK_OK` (Linux, CGO) ; `go vet` natif Windows OK ; `check_no_pii.py` : 0.
 
 ## Commande(s)
 
