@@ -2,16 +2,16 @@
 type: sprint
 id: sprint-15
 title: "Appairage par code robuste : livraison garantie, limite de codes, recul sur 429 (fork)"
-status: ONGOING          # TODO | ONGOING | DONE
+status: DONE          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-10-29
-closed:
+closed: 2026-10-29
 tags: [sprint]
 ---
 
 # Sprint 15 — Appairage par code robuste : livraison garantie, limite de codes, recul sur 429 (fork)
 
-> **status:: ONGOING**  ·  **test:: [[TC-15-appairage-robuste]]**
+> **status:: DONE**  ·  **test:: [[TC-15-appairage-robuste]]**
 
 ## 🎯 Objectif
 
@@ -19,12 +19,12 @@ Corriger les problèmes vus à la mise en service (VM ks-agent) : les événemen
 
 ## 📋 Tâches
 
-- [ ] `deliver` : le webhook est appelé même si l'écriture inbox échoue ; sous-dossiers recréés à chaque écriture
-- [ ] Journal explicite au démarrage : destination des codes d'appairage (inbox / webhook / terminal seul)
-- [ ] Limite `WHATSAPP_PAIR_MAX_CODES` (5) comptant chaque demande, réussie ou non ; une seule demande par session
-- [ ] 429 rate-overlimit : session fermée, recul 5 min doublé jusqu'à 1 h
-- [ ] Abandon (limite, délai, recul au-delà du délai) : événement `pairing_stopped` + sortie code 3
-- [ ] README
+- [x] `deliver` : le webhook est appelé même si l'écriture inbox échoue ; sous-dossiers recréés à chaque écriture
+- [x] Journal explicite au démarrage : destination des codes d'appairage (inbox / webhook / terminal seul)
+- [x] Limite `WHATSAPP_PAIR_MAX_CODES` (5) comptant chaque demande, réussie ou non ; une seule demande par session
+- [x] 429 rate-overlimit : session fermée, recul 5 min doublé jusqu'à 1 h
+- [x] Abandon (limite, délai, recul au-delà du délai) : événement `pairing_stopped` + sortie code 3
+- [x] README
 
 ## 🧪 Test associé (obligatoire)
 
@@ -34,15 +34,16 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 ## ✅ Definition of Done
 
-- [ ] Tâches terminées
-- [ ] Test [[TC-15-appairage-robuste]] **PASS**
-- [ ] Commit fait, message préfixé `[Sprint 15]`
-- [ ] Statut de ce sprint passé à `DONE` + Home.md mis à jour
-- [ ] Bip Windows émis
+- [x] Tâches terminées
+- [x] Test [[TC-15-appairage-robuste]] **PASS**
+- [x] Commit fait, message préfixé `[Sprint 15]`
+- [x] Statut de ce sprint passé à `DONE` + Home.md mis à jour
+- [x] Bip Windows émis
 
 ## 🧾 Journal
 
 - `2026-10-29` — Sprint créé après le retour de mise en service de ks-support-agent-47 (événements d'appairage perdus après 18:03, 429 rate-overlimit sur le simulateur).
+- `2026-10-29` — Livré : commit 55e6ed3 (fix/15-appairage-robuste), mergé dans main. TC-15 PASS.
 
 ## 🔗 Liens
 

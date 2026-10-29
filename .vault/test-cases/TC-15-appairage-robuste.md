@@ -2,15 +2,15 @@
 type: test-case
 id: TC-15-appairage-robuste
 sprint: sprint-15
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-29
-last_run:
+last_run: 2026-10-29
 tags: [test-case]
 ---
 
 # TC-15 — L'appairage livre toujours ses événements et s'arrête proprement
 
-> **sprint:: [[sprint-15-appairage-robuste]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-15-appairage-robuste]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -30,7 +30,9 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-29` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/15/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 44 tests PASS dont TestDeliverRecreatesMissingEventsDir, TestDeliverCallsWebhookWhenInboxFails, TestPairingRequestLimit, TestPairingRateLimitBackoff (5/10/20/40/60/60 min), TestPairingStoppedEvent, TestPairMaxCodes.
+- Non testé : la boucle réseau réelle (`PairPhone`, fermeture de session après 429) — à valider au redéploiement sur la VM ks-agent.
+- Diagnostic : dans le code de cda7e66, un échec d'écriture inbox faisait sortir `deliver` avant l'appel du webhook (les deux canaux muets en même temps). Le cas « dossier events/ non recréé après redémarrage » n'est pas reproductible tel quel (`prepareInbox` le crée au démarrage, ou le pont s'arrête) : nouveau journal de démarrage pour trancher.
 
 ## Commande(s)
 
