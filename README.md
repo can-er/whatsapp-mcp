@@ -121,6 +121,10 @@ The bridge exposes a small REST API (`/api/send`, `/api/download`) used by the M
 
 `send_file` and `send_audio_message` can only send files located in the folder named by `WHATSAPP_MEDIA_DIR` (symlinks are resolved, so a link pointing outside the folder is refused). Set the same value for the bridge and the MCP server. When it is not set, sending files is disabled; text messages still work. Audio converted by ffmpeg is written to that folder temporarily and deleted after sending.
 
+### Downloaded media
+
+File names of received documents are chosen by the sender, so the bridge reduces them to a single safe file name (no directories, `..`, control characters or Windows reserved names) before saving media under `whatsapp-bridge/store/<chat>/`.
+
 ## Architecture Overview
 
 This application consists of two main components:
