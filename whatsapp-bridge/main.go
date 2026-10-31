@@ -834,6 +834,9 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *ch
 		json.NewEncoder(w).Encode(status)
 	})
 
+	// Handler for the joined groups (metadata only)
+	mux.HandleFunc("/api/groups", groupsHandler(opts.groups))
+
 	// Handler for downloading media
 	mux.HandleFunc("/api/download", func(w http.ResponseWriter, r *http.Request) {
 		// Only allow POST requests
@@ -1093,6 +1096,7 @@ func main() {
 
 	opts := apiOptions{
 		sendLog: sentLog,
+		groups:  clientGroups(client),
 		health: func() healthStatus {
 			status := healthStatus{Connected: client.IsConnected(), LoggedIn: client.IsLoggedIn()}
 			if last := lastEventAt.Load(); last != 0 {
