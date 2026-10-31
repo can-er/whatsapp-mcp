@@ -30,7 +30,8 @@ tags: [test-case]
 ## Résultat obtenu
 
 - `2026-10-31` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/18/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 54 tests PASS dont TestReactAPI (envoi unique avec doublon `client_msg_id`, 401 jeton du pont, 403 hors liste, 404 message inconnu ou d'une autre discussion, 400 emoji vide/long/ID manquant, audit `kind`/`target_message_id` sans emoji), TestReplyAPI (groupe + discussion directe donnée par numéro, 400 autre discussion / inconnu / média, 403 hors liste, texte absent de l'audit) et TestReplyAndReactionMessages (clé : participant pour un groupe, from_me pour un message propre, rien en direct ; ContextInfo StanzaID/Participant/QuotedMessage). TestNoMessageTextInLogs reste vert.
-- Non testé : envoi réel à WhatsApp (pas de compte en test), à vérifier sur la VM ; en particulier le participant d'un groupe en adressage LID.
+- `2026-10-31` — Validé en réel en discussion directe sur le simulateur (ks-support-agent-47, 3704339) : réaction 200 « Reaction sent », réponse citée 200 « Reply sent », réaction sur ID inconnu 404.
+- Reste à valider : le cas groupe (participant, adressage LID éventuel), au prochain message réel dans le groupe de l'équipe.
 
 ## Commande(s)
 

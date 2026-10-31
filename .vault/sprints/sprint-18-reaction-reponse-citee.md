@@ -43,6 +43,7 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-10-31` — Sprint créé à la demande de ks-support-agent-47, pour Caner (sprint 13 du pipeline, groupe de l'équipe) : réagir à un message et répondre en le citant.
 - `2026-10-31` — Livré : commit afdbd6f (fix/18-reaction-reponse-citee), mergé dans main. TC-18 PASS.
+- `2026-10-31` — Validé en réel en discussion directe ; activé côté pipeline (KS_GROUP_FEEDBACK=1). Cas groupe à confirmer.
 
 ## 🔗 Liens
 
