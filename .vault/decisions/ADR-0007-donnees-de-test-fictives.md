@@ -35,8 +35,9 @@ Signalé par ks-support-agent-6b à la demande de Caner.
 - Historique public propre ; `check_no_pii.py --history` → 0 occurrence.
 - Les anciens commits restent accessibles par SHA sur GitHub tant que le support ne les a pas
   purgés : tips d'origine `082c904` (main), `39b8945` (fix/04), `8d8c48c` (fix/07), puis
-  `b369aad`, `a193dee`, `c1f80ab` (deuxième passe, numéro d'exemple seulement). Demande de purge à
-  faire par Caner (GitHub Support → « Remove sensitive data »).
+  `b369aad`, `a193dee`, `c1f80ab` (deuxième passe, numéro d'exemple seulement). Décision du
+  2026-10-31 : pas de demande de purge au support GitHub, risque jugé acceptable par
+  l'utilisateur.
 - Les PR upstream #388 et #389 n'ont jamais contenu ces données (vérifié).
 
 ## Alternatives écartées
