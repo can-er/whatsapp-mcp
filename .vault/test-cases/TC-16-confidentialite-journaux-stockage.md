@@ -2,15 +2,15 @@
 type: test-case
 id: TC-16-confidentialite-journaux-stockage
 sprint: sprint-16
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-31
-last_run:
+last_run: 2026-10-31
 tags: [test-case]
 ---
 
 # TC-16 — Aucun texte journalisé, liste blanche stricte, purge effective
 
-> **sprint:: [[sprint-16-confidentialite-journaux-stockage]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-16-confidentialite-journaux-stockage]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -29,7 +29,9 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-31` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/16/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 49 tests PASS dont TestNoMessageTextInLogs, TestChatAllowlistStrict, TestPurgeDisallowedChats (3 chats / 9 messages / 1 dossier média supprimés, chat autorisé intact, texte supprimé absent de messages.db*).
+- Contre-épreuve : une ligne `logger.Debugf("leak %s", content)` injectée dans la synchro d'historique fait échouer TestNoMessageTextInLogs (main.go:1334), puis retirée.
+- Constat : le filtrage du stockage par la liste blanche existait déjà (sprint 04), en amont des lignes « Message content ». Leur présence implique une liste blanche vide ou entièrement invalide sur l'unité de prod (comportement « tout autoriser », désormais refusé au démarrage). À confirmer par la ligne « Chat allowlist enabled » du journal VM.
 
 ## Commande(s)
 
