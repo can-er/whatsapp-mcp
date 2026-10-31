@@ -45,6 +45,7 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 - `2026-10-29` — Sprint créé après le retour de mise en service de ks-support-agent-47 (événements d'appairage perdus après 18:03, 429 rate-overlimit sur le simulateur).
 - `2026-10-29` — Livré : commit 55e6ed3 (fix/15-appairage-robuste), mergé dans main. TC-15 PASS.
 - `2026-10-29` — Redéployé par ks-support-agent-47 en c2e0cae (RestartPreventExitStatus=3, WHATSAPP_PAIR_MAX_CODES=5, démarrage manuel à l'appairage, pairing_stopped relayé sur Telegram). Cause de l'arrêt de 18:03 confirmée : 429, pas la livraison.
+- `2026-10-31` — Les deux ponts sont appairés par code (prod 02:45:13 UTC, 1er code ; simulateur 02:49:38 UTC, 3e code), sans 429 ni abandon.
 
 ## 🔗 Liens
 

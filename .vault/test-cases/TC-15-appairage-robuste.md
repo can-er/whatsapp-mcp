@@ -31,7 +31,7 @@ tags: [test-case]
 ## Résultat obtenu
 
 - `2026-10-29` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/15/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 44 tests PASS dont TestDeliverRecreatesMissingEventsDir, TestDeliverCallsWebhookWhenInboxFails, TestPairingRequestLimit, TestPairingRateLimitBackoff (5/10/20/40/60/60 min), TestPairingStoppedEvent, TestPairMaxCodes.
-- Non testé : la boucle réseau réelle (`PairPhone`, fermeture de session après 429) — à valider au redéploiement sur la VM ks-agent.
+- `2026-10-31` — Validé en réel sur la VM ks-agent (c2e0cae) : pont de prod appairé à 02:45:13 UTC avec le 1er code, simulateur appairé à 02:49:38 UTC avec le 3e code ; événements `pairing_code` et `paired` livrés, aucun `pairing_stopped`, aucun 429. Le chemin « 429 → recul » n'a pas été déclenché en réel.
 - Diagnostic confirmé par le journal de la VM (ks-support-agent-47) : la livraison n'était pas en cause (7 codes écrits entre 17:49 et 18:03, aucun « Failed to deliver », inbox et webhook actifs à chaque démarrage). Cause réelle : 429 rate-overlimit dès 18:06, puis 173 refus, l'ancien code redemandant un code à chaque rotation de QR (environ toutes les 20 s). La limite de demandes et le recul sur 429 de ce sprint traitent ce cas ; le correctif de `deliver` reste valable mais n'était pas la cause.
 
 ## Commande(s)
