@@ -43,6 +43,7 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-10-31` — Sprint créé après le signalement de ks-support-agent-47 : 823 lignes de contenu de conversations privées hors liste blanche dans journalctl après l'appairage, base locale contenant tout l'historique.
 - `2026-10-31` — Livré : commit 00b1298 (fix/16-confidentialite-journaux-stockage), mergé dans main. TC-16 PASS.
+- `2026-10-31` — Diagnostic corrigé : liste blanche active et respectée, seul le texte des discussions autorisées était journalisé. Redéploiement en 119e9c3 par ks-support-agent-47, sans purge.
 
 ## 🔗 Liens
 

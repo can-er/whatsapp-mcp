@@ -31,7 +31,7 @@ tags: [test-case]
 
 - `2026-10-31` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/16/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 49 tests PASS dont TestNoMessageTextInLogs, TestChatAllowlistStrict, TestPurgeDisallowedChats (3 chats / 9 messages / 1 dossier média supprimés, chat autorisé intact, texte supprimé absent de messages.db*).
 - Contre-épreuve : une ligne `logger.Debugf("leak %s", content)` injectée dans la synchro d'historique fait échouer TestNoMessageTextInLogs (main.go:1334), puis retirée.
-- Constat : le filtrage du stockage par la liste blanche existait déjà (sprint 04), en amont des lignes « Message content ». Leur présence implique une liste blanche vide ou entièrement invalide sur l'unité de prod (comportement « tout autoriser », désormais refusé au démarrage). À confirmer par la ligne « Chat allowlist enabled » du journal VM.
+- Constat (confirmé par le journal VM, ks-support-agent-47) : liste blanche active au démarrage de 02:42:58 (2 chats en prod, 1 sur le simulateur) et respectée par le stockage ; les 415 « Message content » et 408 « Stored message » portaient uniquement sur les 2 discussions autorisées (un JID @s.whatsapp.net et un @lid lié à un numéro de la liste). Seul défaut réel : le texte des conversations autorisées dans journalctl, corrigé ici. La liste blanche stricte et la purge restent des garde-fous ; la purge n'est pas activée en prod (rien à purger).
 
 ## Commande(s)
 
