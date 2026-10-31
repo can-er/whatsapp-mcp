@@ -25,4 +25,4 @@ tags: [sprint, index]
 | [[sprint-14-store-dir]] | `DONE` | [[TC-14-store-dir]] |
 | [[sprint-15-appairage-robuste]] | `DONE` | [[TC-15-appairage-robuste]] |
 | [[sprint-16-confidentialite-journaux-stockage]] | `DONE` | [[TC-16-confidentialite-journaux-stockage]] |
-| [[sprint-17-api-groups]] | `ONGOING` | [[TC-17-api-groups]] |
+| [[sprint-17-api-groups]] | `DONE` | [[TC-17-api-groups]] |

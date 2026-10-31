@@ -2,16 +2,16 @@
 type: sprint
 id: sprint-17
 title: "GET /api/groups : découverte des JID de groupes, métadonnées seulement (fork)"
-status: ONGOING          # TODO | ONGOING | DONE
+status: DONE          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-10-31
-closed:
+closed: 2026-10-31
 tags: [sprint]
 ---
 
 # Sprint 17 — GET /api/groups : découverte des JID de groupes, métadonnées seulement (fork)
 
-> **status:: ONGOING**  ·  **test:: [[TC-17-api-groups]]**
+> **status:: DONE**  ·  **test:: [[TC-17-api-groups]]**
 
 ## 🎯 Objectif
 
@@ -19,9 +19,9 @@ tags: [sprint]
 
 ## 📋 Tâches
 
-- [ ] Handler `/api/groups` (GET seulement), source injectable via `apiOptions.groups` (`client.GetJoinedGroups` en production)
-- [ ] Réponse limitée à jid / name / participants_count ; 503 si non connecté, 502 si WhatsApp échoue
-- [ ] README
+- [x] Handler `/api/groups` (GET seulement), source injectable via `apiOptions.groups` (`client.GetJoinedGroups` en production)
+- [x] Réponse limitée à jid / name / participants_count ; 503 si non connecté, 502 si WhatsApp échoue
+- [x] README
 
 ## 🧪 Test associé (obligatoire)
 
@@ -31,15 +31,16 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 ## ✅ Definition of Done
 
-- [ ] Tâches terminées
-- [ ] Test [[TC-17-api-groups]] **PASS**
-- [ ] Commit fait, message préfixé `[Sprint 17]`
-- [ ] Statut de ce sprint passé à `DONE` + Home.md mis à jour
-- [ ] Bip Windows émis
+- [x] Tâches terminées
+- [x] Test [[TC-17-api-groups]] **PASS**
+- [x] Commit fait, message préfixé `[Sprint 17]`
+- [x] Statut de ce sprint passé à `DONE` + Home.md mis à jour
+- [x] Bip Windows émis
 
 ## 🧾 Journal
 
 - `2026-10-31` — Sprint créé à la demande de ks-support-agent-47 (sprint 13 du pipeline) : obtenir le JID du groupe « KS Support & improvements » sans stocker de discussion hors liste blanche.
+- `2026-10-31` — Livré : commit 295fccb (fix/17-api-groups), mergé dans main. TC-17 PASS.
 
 ## 🔗 Liens
 
