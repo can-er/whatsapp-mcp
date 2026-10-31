@@ -23,3 +23,4 @@ tags: [test-case, index]
 - [[TC-14-store-dir]] — Toutes les données vont dans WHATSAPP_STORE_DIR
 - [[TC-15-appairage-robuste]] — L'appairage livre toujours ses événements et s'arrête proprement
 - [[TC-16-confidentialite-journaux-stockage]] — Aucun texte journalisé, liste blanche stricte, purge effective
+- [[TC-17-api-groups]] — La liste des groupes ne contient que les métadonnées autorisées
