@@ -2,15 +2,15 @@
 type: test-case
 id: TC-18-reaction-reponse-citee
 sprint: sprint-18
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-10-31
-last_run:
+last_run: 2026-10-31
 tags: [test-case]
 ---
 
 # TC-18 — Réactions et réponses citées visent le bon message, sous les mêmes garde-fous que l'envoi
 
-> **sprint:: [[sprint-18-reaction-reponse-citee]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-18-reaction-reponse-citee]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -29,7 +29,8 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-10-31` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/18/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 54 tests PASS dont TestReactAPI (envoi unique avec doublon `client_msg_id`, 401 jeton du pont, 403 hors liste, 404 message inconnu ou d'une autre discussion, 400 emoji vide/long/ID manquant, audit `kind`/`target_message_id` sans emoji), TestReplyAPI (groupe + discussion directe donnée par numéro, 400 autre discussion / inconnu / média, 403 hors liste, texte absent de l'audit) et TestReplyAndReactionMessages (clé : participant pour un groupe, from_me pour un message propre, rien en direct ; ContextInfo StanzaID/Participant/QuotedMessage). TestNoMessageTextInLogs reste vert.
+- Non testé : envoi réel à WhatsApp (pas de compte en test), à vérifier sur la VM ; en particulier le participant d'un groupe en adressage LID.
 
 ## Commande(s)
 
