@@ -2,7 +2,7 @@
 type: moc
 title: whatsapp-mcp (durcissement sécurité) — Vault
 tags: [moc, home]
-updated: 2026-10-29
+updated: 2026-10-31
 ---
 
 # 🗂️ whatsapp-mcp — Vault de pilotage
@@ -35,6 +35,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-13-api-history]] | `DONE` | [[TC-13-api-history]] |
 | [[sprint-14-store-dir]] | `DONE` | [[TC-14-store-dir]] |
 | [[sprint-15-appairage-robuste]] | `DONE` | [[TC-15-appairage-robuste]] |
+| [[sprint-16-confidentialite-journaux-stockage]] | `ONGOING` | [[TC-16-confidentialite-journaux-stockage]] |
 
 ## ✅ Test cases
 
