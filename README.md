@@ -148,6 +148,12 @@ export WHATSAPP_ALLOWED_CHATS="15550000003,+1 555 000 0004,120363000000000000@g.
 
 Other chats are then not stored, are hidden from the MCP tools (even if they were stored before), and cannot be used with `/api/send` or `/api/download`.
 
+The bridge refuses to start if `WHATSAPP_ALLOWED_CHATS` is set but contains an invalid entry or no entry at all, instead of falling back to storing every chat. When it is not set, a warning is logged at startup.
+
+Set `WHATSAPP_PURGE_DISALLOWED_CHATS=true` (with `WHATSAPP_ALLOWED_CHATS`) to delete, at startup, the chats, messages and downloaded media stored outside the list, e.g. history synced before the list was set. The database is compacted afterwards so the deleted text does not remain in the file. LID-addressed chats whose phone number is not known yet are deleted too.
+
+The bridge never logs the text of a message, at any level; message IDs, chat JIDs and contact names are only logged at debug level.
+
 ### Downloaded media
 
 File names of received documents are chosen by the sender, so the bridge reduces them to a single safe file name (no directories, `..`, control characters or Windows reserved names) before saving media under `whatsapp-bridge/store/<chat>/`.
