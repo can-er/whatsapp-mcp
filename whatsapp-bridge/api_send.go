@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -29,6 +30,7 @@ type apiOptions struct {
 	send    sendFunc
 	sendLog *sendLog
 	health  func() healthStatus
+	groups  func(ctx context.Context) ([]groupSummary, error)
 }
 
 // apiTokens are the secrets accepted by the REST API. When send is set, only it opens /api/send,
