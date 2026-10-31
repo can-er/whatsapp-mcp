@@ -215,6 +215,8 @@ type SendMessageRequest struct {
 	MediaPath string `json:"media_path,omitempty"`
 	// Optional idempotency key: a request repeated with the same key does not send a second message
 	ClientMsgID string `json:"client_msg_id,omitempty"`
+	// Optional ID of a stored message of the same chat to quote (fork-specific)
+	ReplyToMessageID string `json:"reply_to_message_id,omitempty"`
 }
 
 // Function to send a WhatsApp message
@@ -746,6 +748,12 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *ch
 			return
 		}
 
+		// Reply quoting a stored message of the same chat
+		if req.ReplyToMessageID != "" {
+			handleReply(w, client, messageStore, opts, req)
+			return
+		}
+
 		// Send the message (once per client_msg_id), recorded in the audit log
 		rec, duplicate := opts.sendLog.Send(req.ClientMsgID, req.Recipient, req.Message, req.MediaPath, send)
 		fmt.Println("Message sent", rec.Success, rec.Status, "duplicate:", duplicate)
@@ -833,6 +841,9 @@ func newAPIMux(client *whatsmeow.Client, messageStore *MessageStore, allowed *ch
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(status)
 	})
+
+	// Handler for reactions to a stored message
+	mux.HandleFunc("/api/react", reactHandler(client, messageStore, allowed, opts))
 
 	// Handler for the joined groups (metadata only)
 	mux.HandleFunc("/api/groups", groupsHandler(opts.groups))

@@ -31,6 +31,8 @@ type apiOptions struct {
 	sendLog *sendLog
 	health  func() healthStatus
 	groups  func(ctx context.Context) ([]groupSummary, error)
+	react   reactFunc
+	reply   replyFunc
 }
 
 // apiTokens are the secrets accepted by the REST API. When send is set, only it opens /api/send,
@@ -43,8 +45,11 @@ type apiTokens struct {
 // sendRecord is one line of the audit log. The message text itself is never logged, only its hash.
 type sendRecord struct {
 	Time        time.Time `json:"time"`
+	Kind        string    `json:"kind,omitempty"` // "reaction" or "reply"; empty for a plain message
 	Recipient   string    `json:"recipient"`
 	ClientMsgID string    `json:"client_msg_id,omitempty"`
+	// Reacted-to or quoted message
+	TargetMessageID string `json:"target_message_id,omitempty"`
 	TextSHA256  string    `json:"text_sha256"`
 	HasMedia    bool      `json:"has_media"`
 	Success     bool      `json:"success"`
@@ -102,9 +107,22 @@ func (l *sendLog) append(rec sendRecord) error {
 // recorded result is returned with duplicate=true. Sends are serialized, so concurrent retries
 // of the same request cannot both go through.
 func (l *sendLog) Send(clientMsgID, recipient, text, mediaPath string, send sendFunc) (rec sendRecord, duplicate bool) {
+	rec = sendRecord{Recipient: recipient, TextSHA256: textSHA256(text), HasMedia: mediaPath != ""}
+	return l.Do(clientMsgID, rec, func() (bool, string, string) { return send(recipient, text, mediaPath) })
+}
+
+// textSHA256 is the hash recorded in the audit log instead of a text
+func textSHA256(text string) string {
+	sum := sha256.Sum256([]byte(text))
+	return hex.EncodeToString(sum[:])
+}
+
+// Do runs send unless clientMsgID was already sent successfully (see Send). rec describes the request
+// (kind, recipient, target, text hash); the outcome is added to it and appended to the audit log.
+func (l *sendLog) Do(clientMsgID string, rec sendRecord, send func() (bool, string, string)) (sendRecord, bool) {
 	if l == nil {
-		success, status, id := send(recipient, text, mediaPath)
-		return sendRecord{Recipient: recipient, Success: success, Status: status, MessageID: id}, false
+		rec.Success, rec.Status, rec.MessageID = send()
+		return rec, false
 	}
 
 	l.mu.Lock()
@@ -116,22 +134,13 @@ func (l *sendLog) Send(clientMsgID, recipient, text, mediaPath string, send send
 		}
 	}
 
-	success, status, id := send(recipient, text, mediaPath)
-	sum := sha256.Sum256([]byte(text))
-	rec = sendRecord{
-		Time:        l.now().UTC(),
-		Recipient:   recipient,
-		ClientMsgID: clientMsgID,
-		TextSHA256:  hex.EncodeToString(sum[:]),
-		HasMedia:    mediaPath != "",
-		Success:     success,
-		MessageID:   id,
-		Status:      status,
-	}
+	rec.Success, rec.Status, rec.MessageID = send()
+	rec.Time = l.now().UTC()
+	rec.ClientMsgID = clientMsgID
 	if err := l.append(rec); err != nil {
 		fmt.Printf("Failed to write send audit log: %v\n", err)
 	}
-	if success && clientMsgID != "" {
+	if rec.Success && clientMsgID != "" {
 		l.done[clientMsgID] = rec
 	}
 	return rec, false
