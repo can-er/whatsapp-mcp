@@ -495,19 +495,8 @@ func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *ev
 	if err != nil {
 		logger.Warnf("Failed to store message: %v", err)
 	} else {
-		// Log message reception
-		timestamp := msg.Info.Timestamp.Format("2006-01-02 15:04:05")
-		direction := "←"
-		if msg.Info.IsFromMe {
-			direction = "→"
-		}
-
-		// Log based on message type
-		if mediaType != "" {
-			fmt.Printf("[%s] %s %s: [%s: %s] %s\n", timestamp, direction, sender, mediaType, filename, content)
-		} else if content != "" {
-			fmt.Printf("[%s] %s %s: %s\n", timestamp, direction, sender, content)
-		}
+		// Never log the text, the sender or the file name of a message
+		logger.Debugf("Stored message %s in %s (media: %q)", msg.Info.ID, chatJID, mediaType)
 	}
 }
 
@@ -974,9 +963,31 @@ func main() {
 	defer messageStore.Close()
 
 	// Restrict stored and reachable chats if WHATSAPP_ALLOWED_CHATS is set
-	allowedChats := loadChatAllowlist()
+	allowedChats, err := loadChatAllowlist()
+	if err != nil {
+		logger.Errorf("Invalid WHATSAPP_ALLOWED_CHATS: %v", err)
+		return
+	}
 	if allowedChats != nil {
 		logger.Infof("Chat allowlist enabled: %d chat(s)", len(allowedChats.jids))
+	} else {
+		logger.Warnf("WHATSAPP_ALLOWED_CHATS is not set: every chat is stored")
+	}
+
+	// Optionally delete what was stored outside the allowlist (e.g. before it was set)
+	if purge, _ := strconv.ParseBool(strings.TrimSpace(os.Getenv("WHATSAPP_PURGE_DISALLOWED_CHATS"))); purge {
+		if allowedChats == nil {
+			logger.Warnf("WHATSAPP_PURGE_DISALLOWED_CHATS ignored: WHATSAPP_ALLOWED_CHATS is not set")
+		} else {
+			allows := func(jid types.JID) bool { return allowedChats.AllowsChat(client, jid) }
+			result, err := messageStore.PurgeDisallowedChats(allows, storePath())
+			if err != nil {
+				logger.Errorf("Failed to purge chats outside WHATSAPP_ALLOWED_CHATS: %v", err)
+				return
+			}
+			logger.Warnf("Purged %d chat(s), %d message(s) and %d media folder(s) outside WHATSAPP_ALLOWED_CHATS",
+				result.Chats, result.Messages, result.MediaDirs)
+		}
 	}
 
 	// Emit real-time messages to WHATSAPP_INBOX_DIR / WHATSAPP_EVENT_WEBHOOK_URL if configured
@@ -1116,7 +1127,7 @@ func GetChatName(client *whatsmeow.Client, messageStore *MessageStore, jid types
 	err := messageStore.db.QueryRow("SELECT name FROM chats WHERE jid = ?", chatJID).Scan(&existingName)
 	if err == nil && existingName != "" {
 		// Chat exists with a name, use that
-		logger.Infof("Using existing chat name for %s: %s", chatJID, existingName)
+		logger.Debugf("Using existing chat name for %s: %s", chatJID, existingName)
 		return existingName
 	}
 
@@ -1125,7 +1136,7 @@ func GetChatName(client *whatsmeow.Client, messageStore *MessageStore, jid types
 
 	if jid.Server == "g.us" {
 		// This is a group chat
-		logger.Infof("Getting name for group: %s", chatJID)
+		logger.Debugf("Getting name for group: %s", chatJID)
 
 		// Use conversation data if provided (from history sync)
 		if conversation != nil {
@@ -1169,10 +1180,10 @@ func GetChatName(client *whatsmeow.Client, messageStore *MessageStore, jid types
 			}
 		}
 
-		logger.Infof("Using group name: %s", name)
+		logger.Debugf("Using group name: %s", name)
 	} else {
 		// This is an individual contact
-		logger.Infof("Getting name for contact: %s", chatJID)
+		logger.Debugf("Getting name for contact: %s", chatJID)
 
 		// Just use contact info (full name)
 		contact, err := client.Store.Contacts.GetContact(context.Background(), jid)
@@ -1186,7 +1197,7 @@ func GetChatName(client *whatsmeow.Client, messageStore *MessageStore, jid types
 			name = jid.User
 		}
 
-		logger.Infof("Using contact name: %s", name)
+		logger.Debugf("Using contact name: %s", name)
 	}
 
 	return name
@@ -1264,9 +1275,6 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 					mediaType, filename, url, mediaKey, fileSHA256, fileEncSHA256, fileLength = extractMediaInfo(msg.Message.Message)
 				}
 
-				// Log the message content for debugging
-				logger.Infof("Message content: %v, Media Type: %v", content, mediaType)
-
 				// Skip messages with no content and no media
 				if content == "" && mediaType == "" {
 					continue
@@ -1323,14 +1331,8 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 					logger.Warnf("Failed to store history message: %v", err)
 				} else {
 					syncedCount++
-					// Log successful message storage
-					if mediaType != "" {
-						logger.Infof("Stored message: [%s] %s -> %s: [%s: %s] %s",
-							timestamp.Format("2006-01-02 15:04:05"), sender, chatJID, mediaType, filename, content)
-					} else {
-						logger.Infof("Stored message: [%s] %s -> %s: %s",
-							timestamp.Format("2006-01-02 15:04:05"), sender, chatJID, content)
-					}
+					// Never log the text, the sender or the file name of a message
+					logger.Debugf("Stored history message %s in %s (media: %q)", msgID, chatJID, mediaType)
 				}
 			}
 		}

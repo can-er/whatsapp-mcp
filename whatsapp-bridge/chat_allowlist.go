@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -15,9 +16,27 @@ type chatAllowlist struct {
 	jids map[string]bool
 }
 
-// loadChatAllowlist reads WHATSAPP_ALLOWED_CHATS
-func loadChatAllowlist() *chatAllowlist {
-	return parseChatAllowlist(os.Getenv("WHATSAPP_ALLOWED_CHATS"))
+// loadChatAllowlist reads WHATSAPP_ALLOWED_CHATS. A value that is set but holds an invalid entry,
+// or no entry at all, is an error rather than "every chat allowed".
+func loadChatAllowlist() (*chatAllowlist, error) {
+	raw := os.Getenv("WHATSAPP_ALLOWED_CHATS")
+	if strings.TrimSpace(raw) == "" {
+		return nil, nil
+	}
+	for _, entry := range strings.Split(raw, ",") {
+		if strings.TrimSpace(entry) == "" {
+			continue
+		}
+		if _, ok := normalizeChatJID(entry); !ok {
+			// The entry itself is not logged: it is a phone number
+			return nil, fmt.Errorf("an entry is not a phone number or a JID")
+		}
+	}
+	allowed := parseChatAllowlist(raw)
+	if allowed == nil {
+		return nil, fmt.Errorf("no chat in the list")
+	}
+	return allowed, nil
 }
 
 // parseChatAllowlist parses a comma-separated list of JIDs or phone numbers.
