@@ -73,9 +73,9 @@ func requireAPIAuth(tokens apiTokens, next http.Handler) http.Handler {
 			return
 		}
 
-		// /api/send requires the dedicated send token when one is configured
+		// Sending endpoints require the dedicated send token when one is configured
 		token := tokens.bridge
-		if tokens.send != "" && path.Clean(r.URL.Path) == "/api/send" {
+		if p := path.Clean(r.URL.Path); tokens.send != "" && (p == "/api/send" || p == "/api/react") {
 			token = tokens.send
 		}
 		if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+token)) != 1 {
