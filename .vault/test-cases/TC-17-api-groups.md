@@ -29,7 +29,7 @@ tags: [test-case]
 ## Résultat obtenu
 
 - `2026-10-31` — **PASS** : `bash .vault/tools/gocheck.sh .worktrees/17/whatsapp-bridge -v` (Docker golang:1.27-bookworm, CGO) → build + vet OK, 51 tests PASS dont TestGroupsAPI (tri par nom, 3 clés exactement, aucun JID de participant ; 401 sans jeton ou avec le jeton d'envoi, 405 en POST) et TestGroupsAPIErrors (503 non connecté / sans source, 502 erreur WhatsApp).
-- Non testé : l'appel réel `GetJoinedGroups` (pas de compte en test), à vérifier sur la VM.
+- `2026-10-31` — Validé en réel sur la VM (ks-support-agent-47, 931051c) : 200, 159 groupes listés, une seule correspondance exacte pour le groupe cible (3 participants) ; JID ajouté à la liste blanche (3 chats), redémarrage sans réappairage.
 
 ## Commande(s)
 

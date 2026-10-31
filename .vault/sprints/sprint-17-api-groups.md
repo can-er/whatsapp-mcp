@@ -41,6 +41,7 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-10-31` — Sprint créé à la demande de ks-support-agent-47 (sprint 13 du pipeline) : obtenir le JID du groupe « KS Support & improvements » sans stocker de discussion hors liste blanche.
 - `2026-10-31` — Livré : commit 295fccb (fix/17-api-groups), mergé dans main. TC-17 PASS.
+- `2026-10-31` — Validé en réel par ks-support-agent-47 ; groupe ajouté à la liste blanche de prod.
 
 ## 🔗 Liens
 
