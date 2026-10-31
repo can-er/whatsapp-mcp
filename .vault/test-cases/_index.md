@@ -24,3 +24,4 @@ tags: [test-case, index]
 - [[TC-15-appairage-robuste]] — L'appairage livre toujours ses événements et s'arrête proprement
 - [[TC-16-confidentialite-journaux-stockage]] — Aucun texte journalisé, liste blanche stricte, purge effective
 - [[TC-17-api-groups]] — La liste des groupes ne contient que les métadonnées autorisées
+- [[TC-18-reaction-reponse-citee]] — Réactions et réponses citées visent le bon message, sous les mêmes garde-fous que l'envoi
