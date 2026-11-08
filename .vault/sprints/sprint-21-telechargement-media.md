@@ -15,7 +15,7 @@ tags: [sprint]
 
 ## 🎯 Objectif
 
-`POST /api/download` ne doit plus renvoyer 403 pour un média encore valide. Cause probable : le chemin direct (`direct_path`) est stocké tel que WhatsApp le donne, avec ses paramètres signés, était reconstruit depuis l'URL en coupant ses paramètres signés ; il est désormais stocké tel que WhatsApp le donne. Si le média est déjà dans l'inbox (même empreinte SHA-256), ce fichier est renvoyé. Si le CDN répond 403/404/410, le pont demande un renouvellement au téléphone (media retry de whatsmeow) puis retélécharge.
+`POST /api/download` ne doit plus renvoyer 403 pour un média encore valide. Cause probable : le chemin direct était reconstruit depuis l'URL en coupant ses paramètres signés (`oh`, `oe`) ; il est désormais stocké tel que WhatsApp le donne (`direct_path`). Si le média est déjà dans l'inbox (même empreinte SHA-256), ce fichier est renvoyé. Si le CDN répond 403/404/410, le pont demande un renouvellement au téléphone (media retry de whatsmeow) puis retélécharge.
 
 ## 📋 Tâches
 

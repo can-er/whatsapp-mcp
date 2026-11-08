@@ -2,15 +2,15 @@
 type: test-case
 id: TC-19-legende-medias
 sprint: sprint-19
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-11-08
-last_run:
+last_run: 2026-11-08
 tags: [test-case]
 ---
 
 # TC-19 — La légende d'un média est stockée comme contenu du message
 
-> **sprint:: [[sprint-19-legende-medias]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-19-legende-medias]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -29,7 +29,11 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-11-08` — **PASS** (branche `fix/19-legende-medias`, commit cb12a33).
+  - `TestCaptionStoredAsContent` : texte, texte étendu, légendes image / vidéo / document, média sans légende, audio, nil → PASS ; même texte que `messageText` des événements.
+  - `TestCaptionStoredFromLiveMessage` et `TestCaptionStoredFromHistorySync` (SQLite, CGO) → PASS.
+  - Suite complète PASS (3 tests de permissions Unix ignorés sous Windows).
+  - ⚠️ Exécution faite sous Windows (Go 1.27, CGO avec `zig cc` comme compilateur C) : Docker Desktop ne démarrait plus de conteneur ce soir-là, donc `gocheck.sh` (Linux) n'a pas pu tourner. À relancer avant le merge.
 
 ## Commande(s)
 

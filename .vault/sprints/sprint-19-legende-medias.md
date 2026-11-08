@@ -2,16 +2,16 @@
 type: sprint
 id: sprint-19
 title: "Légende des images, vidéos et documents stockée dans messages.db (fork)"
-status: ONGOING          # TODO | ONGOING | DONE
+status: DONE          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-11-08
-closed:
+closed: 2026-11-08
 tags: [sprint]
 ---
 
 # Sprint 19 — Légende des images, vidéos et documents stockée dans messages.db (fork)
 
-> **status:: ONGOING**  ·  **test:: [[TC-19-legende-medias]]**
+> **status:: DONE**  ·  **test:: [[TC-19-legende-medias]]**
 
 ## 🎯 Objectif
 
@@ -19,9 +19,9 @@ La légende (caption) d'une image, d'une vidéo ou d'un document est enregistré
 
 ## 📋 Tâches
 
-- [ ] `extractTextContent` : texte, texte étendu, puis légende image / vidéo / document (même règle que `messageText` des événements)
-- [ ] Synchronisation d'historique : même extraction (la légende n'y était pas lue non plus)
-- [ ] README
+- [x] `extractTextContent` : texte, texte étendu, puis légende image / vidéo / document (même règle que `messageText` des événements)
+- [x] Synchronisation d'historique : même extraction (la légende n'y était pas lue non plus)
+- [x] README
 
 ## 🧪 Test associé (obligatoire)
 
@@ -31,15 +31,17 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 ## ✅ Definition of Done
 
-- [ ] Tâches terminées
-- [ ] Test [[TC-19-legende-medias]] **PASS**
-- [ ] Commit fait, message préfixé `[Sprint 19]`
-- [ ] Statut de ce sprint passé à `DONE` + Home.md mis à jour
-- [ ] Bip Windows émis
+- [x] Tâches terminées
+- [x] Test [[TC-19-legende-medias]] **PASS**
+- [x] Commit fait, message préfixé `[Sprint 19]`
+- [x] Statut de ce sprint passé à `DONE` + Home.md mis à jour
+- [x] Bip Windows émis
 
 ## 🧾 Journal
 
 - `2026-11-08` — Sprint créé à la demande de la session KS Esthetic (« Higgsfield CLI et skills »), pour Caner, après lecture du groupe de l'équipe via le pont de production : une image avec légende du groupe a `content` vide dans messages.db alors que l'événement JSON contient le texte.
+
+- `2026-11-08` — Corrigé sur `fix/19-legende-medias` (cb12a33), PR [#1](https://github.com/can-er/whatsapp-mcp/pull/1) ouverte sur le fork, merge par Caner. Les lignes déjà stockées gardent `content` vide.
 
 ## 🔗 Liens
 
