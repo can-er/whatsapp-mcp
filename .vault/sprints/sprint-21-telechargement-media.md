@@ -2,7 +2,7 @@
 type: sprint
 id: sprint-21
 title: "/api/download : chemin d'accès direct complet, copie de l'inbox et renouvellement du média (fork)"
-status: TODO          # TODO | ONGOING | DONE
+status: ONGOING          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-11-08
 closed:
@@ -11,7 +11,7 @@ tags: [sprint]
 
 # Sprint 21 — /api/download : chemin d'accès direct complet, copie de l'inbox et renouvellement du média (fork)
 
-> **status:: TODO**  ·  **test:: [[TC-21-telechargement-media]]**
+> **status:: ONGOING**  ·  **test:: [[TC-21-telechargement-media]]**
 
 ## 🎯 Objectif
 
