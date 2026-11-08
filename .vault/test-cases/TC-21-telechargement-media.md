@@ -33,7 +33,8 @@ tags: [test-case]
   - `TestDirectPathFromURL` : la requête signée (`oh`, `oe`) est conservée ; l'ancien code la coupait → PASS.
   - `TestMediaRetryWaiter` → PASS.
   - `TestMediaDownloadUsesStoredDirectPath`, `…FallsBackToURLWithQuery`, `…FromInbox`, `…RetriesExpiredMedia` (403, 404, 410), `…RetryFailures`, `TestDirectPathStoredFromLiveMessage` (SQLite, CGO) → PASS.
-  - Suite complète : 66 PASS, 3 ignorés (permissions Unix sous Windows). ⚠️ Exécutée sous Windows (CGO avec `zig cc`) car Docker Desktop était bloqué ; `gocheck.sh` (Linux) à relancer avant le merge.
+  - Suite complète sous Windows (CGO avec `zig cc`, Docker Desktop bloqué) : 66 PASS, 3 ignorés (permissions Unix).
+- `2026-11-08` — **PASS sous Linux** : `gocheck.sh` sur ed16824 (contient les trois correctifs) → `GOCHECK_OK`, 69 tests et sous-tests PASS, aucun ignoré (les tests de permissions Unix tournent).
   - Non testé en réel : aucun compte WhatsApp connecté pendant les tests. À vérifier après déploiement : un média récent, puis un média plus ancien que la rétention du CDN.
 
 ## Commande(s)

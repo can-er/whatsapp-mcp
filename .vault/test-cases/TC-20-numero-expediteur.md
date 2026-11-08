@@ -33,7 +33,8 @@ tags: [test-case]
   - `TestSenderPhoneOfMessage` : LID + SenderAlt, LID résolu par la table LID, LID inconnu (vide), numéro, message envoyé par soi → PASS.
   - `TestSenderPhoneStoredFromLiveMessage` et `TestSenderPhoneStoredFromHistorySync` (SQLite, CGO) : `sender_phone` rempli, `sender` inchangé → PASS.
   - `TestSenderPhoneMigrationAndBackfill` : base à l'ancien schéma ouverte, colonne ajoutée, réouverture OK ; rattrapage de 5 lignes sur 7, les 2 identifiants inconnus restent NULL ; second passage : 0 → PASS.
-  - Suite complète PASS. ⚠️ Exécutée sous Windows (CGO avec `zig cc`) car Docker Desktop était bloqué ; `gocheck.sh` (Linux) à relancer avant le merge.
+  - Suite complète PASS, d'abord exécutée sous Windows (CGO avec `zig cc`) car Docker Desktop était bloqué.
+- `2026-11-08` — **PASS sous Linux** : `gocheck.sh` sur 4e19227 → `GOCHECK_OK`, 61 tests et sous-tests PASS, aucun ignoré.
 
 ## Commande(s)
 

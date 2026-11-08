@@ -33,7 +33,8 @@ tags: [test-case]
   - `TestCaptionStoredAsContent` : texte, texte étendu, légendes image / vidéo / document, média sans légende, audio, nil → PASS ; même texte que `messageText` des événements.
   - `TestCaptionStoredFromLiveMessage` et `TestCaptionStoredFromHistorySync` (SQLite, CGO) → PASS.
   - Suite complète PASS (3 tests de permissions Unix ignorés sous Windows).
-  - ⚠️ Exécution faite sous Windows (Go 1.27, CGO avec `zig cc` comme compilateur C) : Docker Desktop ne démarrait plus de conteneur ce soir-là, donc `gocheck.sh` (Linux) n'a pas pu tourner. À relancer avant le merge.
+  - Première exécution sous Windows (Go 1.27, CGO avec `zig cc`), Docker Desktop étant bloqué ce soir-là.
+- `2026-11-08` — **PASS sous Linux** : `gocheck.sh` (build + vet + test, `golang:1.27-bookworm`, CGO) sur cb12a33 → `GOCHECK_OK`, 57 tests et sous-tests PASS, aucun ignoré.
 
 ## Commande(s)
 
