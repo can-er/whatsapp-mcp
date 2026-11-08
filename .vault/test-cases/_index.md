@@ -25,3 +25,6 @@ tags: [test-case, index]
 - [[TC-16-confidentialite-journaux-stockage]] — Aucun texte journalisé, liste blanche stricte, purge effective
 - [[TC-17-api-groups]] — La liste des groupes ne contient que les métadonnées autorisées
 - [[TC-18-reaction-reponse-citee]] — Réactions et réponses citées visent le bon message, sous les mêmes garde-fous que l'envoi
+- [[TC-19-legende-medias]] — La légende d'un média est stockée comme contenu du message
+- [[TC-20-numero-expediteur]] — Le numéro de l'expéditeur est stocké même quand WhatsApp n'envoie que le LID
+- [[TC-21-telechargement-media]] — Le téléchargement d'un média réussit avec le chemin signé, la copie de l'inbox ou un renouvellement
