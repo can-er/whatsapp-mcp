@@ -76,7 +76,15 @@ func TestCaptionStoredFromLiveMessage(t *testing.T) {
 
 func TestCaptionStoredFromHistorySync(t *testing.T) {
 	store := newCaptionStore(t)
-	sync := &events.HistorySync{Data: &waHistorySync.HistorySync{
+	sync := captionHistorySync()
+	handleHistorySync(nil, store, sync, parseChatAllowlist(captionGroup), waLog.Noop)
+	if content, mediaType := storedContent(t, store, "HIST1"); content != "history caption" || mediaType != "video" {
+		t.Fatalf("content %q media %q", content, mediaType)
+	}
+}
+
+func captionHistorySync() *events.HistorySync {
+	return &events.HistorySync{Data: &waHistorySync.HistorySync{
 		SyncType: waHistorySync.HistorySync_RECENT.Enum(),
 		Conversations: []*waHistorySync.Conversation{{
 			ID:   proto.String(captionGroup),
@@ -95,8 +103,4 @@ func TestCaptionStoredFromHistorySync(t *testing.T) {
 			}},
 		}},
 	}}
-	handleHistorySync(nil, store, sync, parseChatAllowlist(captionGroup), waLog.Noop)
-	if content, mediaType := storedContent(t, store, "HIST1"); content != "history caption" || mediaType != "video" {
-		t.Fatalf("content %q media %q", content, mediaType)
-	}
 }

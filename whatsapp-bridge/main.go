@@ -94,6 +94,11 @@ func NewMessageStore() (*MessageStore, error) {
 		db.Close()
 		return nil, fmt.Errorf("failed to create tables: %v", err)
 	}
+	// Sender phone number, next to the sender as WhatsApp addressed it (fork; added to older databases)
+	if err := addColumnIfMissing(db, "messages", "sender_phone", "TEXT"); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to migrate messages table: %v", err)
+	}
 
 	return &MessageStore{db: db}, nil
 }
@@ -486,6 +491,10 @@ func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *ev
 	// Emit the message to the inbox / webhook for local automation (no-op when not configured)
 	sink.Enqueue(msg, name)
 
+	if err == nil {
+		phone := clientSenderIdentity(client).messagePhone(msg.Info.Sender, msg.Info.SenderAlt, msg.Info.IsFromMe)
+		err = messageStore.SetSenderPhone(msg.Info.ID, chatJID, phone)
+	}
 	if err != nil {
 		logger.Warnf("Failed to store message: %v", err)
 	} else {
@@ -1027,6 +1036,14 @@ func main() {
 
 		case *events.Connected:
 			logger.Infof("Connected to WhatsApp")
+			// Fill the sender phone number of messages stored before it was known (or by an older version)
+			go func() {
+				if n, err := messageStore.BackfillSenderPhones(clientSenderIdentity(client)); err != nil {
+					logger.Warnf("Failed to fill sender phone numbers: %v", err)
+				} else if n > 0 {
+					logger.Infof("Filled the sender phone number of %d stored message(s)", n)
+				}
+			}()
 
 		case *events.LoggedOut:
 			logger.Warnf("Device logged out, please scan QR code to log in again")
@@ -1282,6 +1299,7 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 
 				// Determine sender
 				var sender string
+				senderJID := jid
 				isFromMe := false
 				if msg.Message.Key != nil {
 					if msg.Message.Key.FromMe != nil {
@@ -1289,6 +1307,9 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 					}
 					if !isFromMe && msg.Message.Key.Participant != nil && *msg.Message.Key.Participant != "" {
 						sender = *msg.Message.Key.Participant
+						if parsed, err := types.ParseJID(sender); err == nil {
+							senderJID = parsed
+						}
 					} else if isFromMe {
 						sender = client.Store.ID.User
 					} else {
@@ -1327,6 +1348,10 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 					fileEncSHA256,
 					fileLength,
 				)
+				if err == nil {
+					phone := clientSenderIdentity(client).messagePhone(senderJID, types.EmptyJID, isFromMe)
+					err = messageStore.SetSenderPhone(msgID, chatJID, phone)
+				}
 				if err != nil {
 					logger.Warnf("Failed to store history message: %v", err)
 				} else {

@@ -249,6 +249,7 @@ This application consists of two main components:
 - All message history is stored in a SQLite database within the `whatsapp-bridge/store/` directory
 - The database maintains tables for chats and messages
 - Messages are indexed for efficient searching and retrieval
+- `messages.sender_phone` (fork) holds the sender's phone number, also when WhatsApp only gives the sender's LID (e.g. in groups): it comes from the message's alternate address or from the LID map of the WhatsApp session. `messages.sender` is unchanged (phone number or LID, as WhatsApp addressed the message). Filter by number with `sender_phone = '15550000001'`. Older databases get the column at startup; rows stored before are filled after each connection when the number can be resolved, and left empty otherwise.
 - `messages.content` holds the text of a message, or the caption of an image, video or document (fork; the same text as the `text` field of message events). Messages stored by an earlier version keep an empty `content` for captioned media.
 - `whatsapp-bridge/store/` holds your WhatsApp session keys (`whatsapp.db`, which give full access to your account) and your message history. The bridge restricts it to your user: the directory is set to `0700` (also when it already exists) and the databases and downloaded media to `0600`.
 - Set `WHATSAPP_STORE_DIR` (for the bridge and the MCP server) to keep this data elsewhere than `whatsapp-bridge/store/` relative to the working directory, e.g. a systemd `StateDirectory=`. Use one directory per bridge instance (each WhatsApp account).
