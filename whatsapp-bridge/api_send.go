@@ -33,6 +33,7 @@ type apiOptions struct {
 	groups  func(ctx context.Context) ([]groupSummary, error)
 	react   reactFunc
 	reply   replyFunc
+	media   *mediaFetcher
 }
 
 // apiTokens are the secrets accepted by the REST API. When send is set, only it opens /api/send,

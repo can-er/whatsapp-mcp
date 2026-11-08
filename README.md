@@ -158,6 +158,8 @@ The bridge never logs the text of a message, at any level; message IDs, chat JID
 
 File names of received documents are chosen by the sender, so the bridge reduces them to a single safe file name (no directories, `..`, control characters or Windows reserved names) before saving media under `whatsapp-bridge/store/<chat>/`.
 
+`POST /api/download` (fork) returns, in this order: the copy already saved under `store/<chat>/`; the copy written by the message events in `WHATSAPP_INBOX_DIR/media/<id>.<ext>` when its SHA-256 matches the one WhatsApp gave; otherwise it downloads the media from the WhatsApp CDN with the direct path stored with the message (`messages.direct_path`, including its signed query). When the CDN copy has expired (HTTP 403, 404 or 410), the bridge asks the phone to upload the media again (media retry, up to 30 s), stores the new path and downloads again. This needs the bridge to be connected and the phone to still have the media.
+
 ## Message events (fork)
 
 For local automation, the bridge can emit every real-time message of the allowed chats (see `WHATSAPP_ALLOWED_CHATS`; history sync is not emitted). Both outputs are optional and independent:
