@@ -28,5 +28,5 @@ tags: [sprint, index]
 | [[sprint-17-api-groups]] | `DONE` | [[TC-17-api-groups]] |
 | [[sprint-18-reaction-reponse-citee]] | `DONE` | [[TC-18-reaction-reponse-citee]] |
 | [[sprint-19-legende-medias]] | `DONE` | [[TC-19-legende-medias]] |
-| [[sprint-20-numero-expediteur]] | `TODO` | [[TC-20-numero-expediteur]] |
+| [[sprint-20-numero-expediteur]] | `ONGOING` | [[TC-20-numero-expediteur]] |
 | [[sprint-21-telechargement-media]] | `TODO` | [[TC-21-telechargement-media]] |

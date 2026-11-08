@@ -2,7 +2,7 @@
 type: sprint
 id: sprint-20
 title: "Numéro de l'expéditeur stocké dans messages.db à côté du LID (colonne sender_phone, fork)"
-status: TODO          # TODO | ONGOING | DONE
+status: ONGOING          # TODO | ONGOING | DONE
 owner: CK
 created: 2026-11-08
 closed:
@@ -11,7 +11,7 @@ tags: [sprint]
 
 # Sprint 20 — Numéro de l'expéditeur stocké dans messages.db à côté du LID (colonne sender_phone, fork)
 
-> **status:: TODO**  ·  **test:: [[TC-20-numero-expediteur]]**
+> **status:: ONGOING**  ·  **test:: [[TC-20-numero-expediteur]]**
 
 ## 🎯 Objectif
 
