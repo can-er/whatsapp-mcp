@@ -183,21 +183,13 @@ func (store *MessageStore) GetChats() (map[string]time.Time, error) {
 	return chats, nil
 }
 
-// Extract text content from a message
+// Extract the text of a message: plain or extended text, or the caption of an image, video or
+// document (the same text as the message events)
 func extractTextContent(msg *waProto.Message) string {
 	if msg == nil {
 		return ""
 	}
-
-	// Try to get text content
-	if text := msg.GetConversation(); text != "" {
-		return text
-	} else if extendedText := msg.GetExtendedTextMessage(); extendedText != nil {
-		return extendedText.GetText()
-	}
-
-	// For now, we're ignoring non-text messages
-	return ""
+	return messageText(msg)
 }
 
 // SendMessageResponse represents the response for the send message API
@@ -1271,15 +1263,8 @@ func handleHistorySync(client *whatsmeow.Client, messageStore *MessageStore, his
 					continue
 				}
 
-				// Extract text content
-				var content string
-				if msg.Message.Message != nil {
-					if conv := msg.Message.Message.GetConversation(); conv != "" {
-						content = conv
-					} else if ext := msg.Message.Message.GetExtendedTextMessage(); ext != nil {
-						content = ext.GetText()
-					}
-				}
+				// Extract text content (text or media caption)
+				content := extractTextContent(msg.Message.Message)
 
 				// Extract media info
 				var mediaType, filename, url string
