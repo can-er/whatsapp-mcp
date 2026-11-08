@@ -43,6 +43,8 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-11-08` — Corrigé sur `fix/19-legende-medias` (cb12a33), PR [#1](https://github.com/can-er/whatsapp-mcp/pull/1) ouverte sur le fork, merge par Caner. Les lignes déjà stockées gardent `content` vide.
 
+- `2026-11-08` — Fusionné dans `main` sur accord de Caner (gocheck Linux PASS sur `main`). Déploiement sur la VM non fait depuis ce poste : 10.10.10.90 injoignable en SSH.
+
 ## 🔗 Liens
 
 - ADR : [[ADR-0006-interface-pont-pipeline]]

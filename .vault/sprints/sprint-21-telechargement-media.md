@@ -44,6 +44,8 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-11-08` — Corrigé sur `fix/21-telechargement-media` (ed16824), PR [#3](https://github.com/can-er/whatsapp-mcp/pull/3) empilée sur #2. L'inbox renvoie son propre chemin (pas de copie dans `store/`), ce qui respecte la purge de rétention de l'inbox.
 
+- `2026-11-08` — Fusionné dans `main` sur accord de Caner (gocheck Linux PASS sur `main`). Déploiement sur la VM non fait depuis ce poste : 10.10.10.90 injoignable en SSH.
+
 ## 🔗 Liens
 
 - ADR : [[ADR-0006-interface-pont-pipeline]]

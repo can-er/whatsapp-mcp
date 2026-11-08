@@ -45,6 +45,8 @@ Chaque sprint a **un test spécifique** qui prouve la fonctionnalité. À exécu
 
 - `2026-11-08` — Corrigé sur `fix/20-numero-expediteur` (4e19227), PR [#2](https://github.com/can-er/whatsapp-mcp/pull/2) empilée sur #1. Choix : nouvelle colonne `sender_phone` plutôt que réécrire `sender`, car les réactions et réponses citées (sprint 18) construisent la clé du message à partir de `sender` (LID nécessaire dans les groupes LID). Le serveur MCP Python filtre encore sur `sender`.
 
+- `2026-11-08` — Fusionné dans `main` sur accord de Caner (gocheck Linux PASS sur `main`). Déploiement sur la VM non fait depuis ce poste : 10.10.10.90 injoignable en SSH.
+
 ## 🔗 Liens
 
 - ADR : [[ADR-0006-interface-pont-pipeline]]
