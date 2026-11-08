@@ -40,7 +40,7 @@ Navigation par liens `[[...]]`.
 | [[sprint-18-reaction-reponse-citee]] | `DONE` | [[TC-18-reaction-reponse-citee]] |
 | [[sprint-19-legende-medias]] | `DONE` | [[TC-19-legende-medias]] |
 | [[sprint-20-numero-expediteur]] | `DONE` | [[TC-20-numero-expediteur]] |
-| [[sprint-21-telechargement-media]] | `ONGOING` | [[TC-21-telechargement-media]] |
+| [[sprint-21-telechargement-media]] | `DONE` | [[TC-21-telechargement-media]] |
 
 ## ✅ Test cases
 

@@ -2,15 +2,15 @@
 type: test-case
 id: TC-21-telechargement-media
 sprint: sprint-21
-status: TODO          # TODO | PASS | FAIL
+status: PASS          # TODO | PASS | FAIL
 created: 2026-11-08
-last_run:
+last_run: 2026-11-08
 tags: [test-case]
 ---
 
 # TC-21 — Le téléchargement d'un média réussit avec le chemin signé, la copie de l'inbox ou un renouvellement
 
-> **sprint:: [[sprint-21-telechargement-media]]**  ·  **status:: TODO**
+> **sprint:: [[sprint-21-telechargement-media]]**  ·  **status:: PASS**
 
 ## Préconditions
 
@@ -29,7 +29,12 @@ tags: [test-case]
 
 ## Résultat obtenu
 
-- _(à remplir à l'exécution)_
+- `2026-11-08` — **PASS** (branche `fix/21-telechargement-media`, commit ed16824, empilée sur `fix/20`).
+  - `TestDirectPathFromURL` : la requête signée (`oh`, `oe`) est conservée ; l'ancien code la coupait → PASS.
+  - `TestMediaRetryWaiter` → PASS.
+  - `TestMediaDownloadUsesStoredDirectPath`, `…FallsBackToURLWithQuery`, `…FromInbox`, `…RetriesExpiredMedia` (403, 404, 410), `…RetryFailures`, `TestDirectPathStoredFromLiveMessage` (SQLite, CGO) → PASS.
+  - Suite complète : 66 PASS, 3 ignorés (permissions Unix sous Windows). ⚠️ Exécutée sous Windows (CGO avec `zig cc`) car Docker Desktop était bloqué ; `gocheck.sh` (Linux) à relancer avant le merge.
+  - Non testé en réel : aucun compte WhatsApp connecté pendant les tests. À vérifier après déploiement : un média récent, puis un média plus ancien que la rétention du CDN.
 
 ## Commande(s)
 
